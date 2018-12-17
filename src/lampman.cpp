@@ -14,9 +14,9 @@ Lampman::Lampman(QWidget *parent)
 	QVBoxLayout *vbox = new QVBoxLayout;
 	QTabWidget  *tabView = new QTabWidget();
 
-	PageCpanel 	*pageCpanel = new PageCpanel();
-	PageVhosts 	*pageVhosts = new PageVhosts();
-	PagePhp 	*pagePhp 	= new PagePhp();
+	PageCpanel *pageCpanel = new PageCpanel();
+	PageVhosts *pageVhosts = new PageVhosts();
+	PagePhp    *pagePhp    = new PagePhp();
 
 	tabView->addTab(pageCpanel, "Control Panel");
 	tabView->addTab(pageVhosts, "Virtual Hosts");
