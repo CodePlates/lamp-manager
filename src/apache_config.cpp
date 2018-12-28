@@ -1,17 +1,8 @@
 #include <QFile>
 #include <QDirIterator>
-#include <QMap>
 #include <QStack>
 #include "include/apache_config.hpp"
 
-enum Token {
-	TOK_END,
-	TOK_OPEN_ANGLE,
-	TOK_CLOSE_ANGLE,
-	TOK_CLOSE_TAG,
-	TOK_WORD,
-	TOK_LINE_END
-};
 
 A2Config::A2Config()
 {
@@ -29,25 +20,19 @@ QString A2Config::findConf()
 	return "/etc/apache2/apache2.conf";
 }
 
-void A2Config::parseFile(QString path, QString conf)
+void A2Config::parseFile(QString path, ConfTree* parent)
 {
 	QFileInfo info(path);
 
-	if (!conf.isNull()) {
-		QFileInfo confInfo(conf);
+	if (parent != nullptr) {
+		QFileInfo confInfo(parent->getFilepath());
 		QDir::setCurrent(confInfo.dir().absolutePath());
 	}
 
 	QDirIterator it(info.dir().absolutePath(), QStringList() << info.fileName());
 
-	//QTextStream out(stdout);
-
-	//out << path << endl;
-
 	while (it.hasNext()) {
 		QString conf = it.next();
-
-		//out << conf << endl;
 
 		QFile file(conf);
 		if (!file.open(QIODevice::ReadOnly)) {
@@ -57,65 +42,81 @@ void A2Config::parseFile(QString path, QString conf)
 
 		QTextStream in(&file);
 
-		parse(conf, in);
+		ConfTree* tree = parse(conf, in);
+		if (parent == nullptr) 
+			this->configTree = tree;
+		else
+			parent->addTree(tree);
 
 		file.close();
 	}
 }
 
-void A2Config::parse(QString conf, QTextStream& in)
+QStringList A2Config::getValues(QTextStream& in, bool tag) {
+	Token tok_type;
+	QString value;
+	QStringList values;
+	Token end = Token::TOK_LINE_END;
+
+	if (tag)
+		end = Token::TOK_CLOSE_ANGLE;
+
+	tok_type = get_tok(in, value);
+
+	while (tok_type != Token::TOK_END && tok_type != end) {
+		if (tok_type == Token::TOK_WORD) {
+			values.append(value);
+		}
+		tok_type = get_tok(in, value);
+	}
+
+	return values;
+}
+
+ConfTree* A2Config::parse(QString conf, QTextStream& in)
 {
-	ConfTree configTree;
-	ConfTree* currTree = &configTree;
+	ConfTree* configTree = new ConfTree(conf);
+	ConfTree* currTree = configTree;
 	QStack<ConfTree*> stack; 
-	stack.push(&configTree);
+	stack.push(configTree);
+	QTextStream out(stdout);
 
 	
-	QString key, tag, value;
+	QString key, value;
 	
-	int tok_type = get_tok(in, key);
-	while (tok_type != TOK_END)
-	{
-		
-		if (tok_type == TOK_OPEN_ANGLE) {
-			QStringList values;
-			tok_type = get_tok(in, tag);
-			ConfTree* tree = new ConfTree(tag);
-			stack.push(tree);
-			currTree = tree;
+	Token tok_type;
+	
+	do {
+		tok_type = get_tok(in, key);
 
-			tok_type = get_tok(in, value);
-			while (tok_type != TOK_END && tok_type != TOK_CLOSE_ANGLE) {
-				if (tok_type == TOK_WORD) {
-					values.append(value);
-				}
-				tok_type = get_tok(in, value);
-			}
-			tree->setTagValues(values);	
+		if (tok_type == Token::TOK_OPEN_ANGLE) {
+			
+			tok_type = get_tok(in, key);
+			QStringList values = getValues(in, true);
+			
+			ConfNode tagNode(key, values);
+			ConfTree* tag = currTree->addTag(tagNode);
+			stack.push(tag);
+			currTree = tag;
+
+			continue;
 		}
 
-		if (tok_type == TOK_CLOSE_TAG) {
-			while (tok_type != TOK_END && tok_type != TOK_CLOSE_ANGLE) {
-				//if (tok_type == TOK_WORD) values.append(value);
+		if (tok_type == Token::TOK_CLOSE_TAG) {
+			while (tok_type != Token::TOK_END && tok_type != Token::TOK_CLOSE_ANGLE) {
+				//if (tok_type == Token::TOK_WORD) values.append(value);
 				tok_type = get_tok(in, value);
 			}
-
-			ConfTree* old = currTree; 
+ 
 			stack.pop();
 			currTree = stack.last();
-			currTree->add(old);
 			
+			continue;
 		}
 		
-		if (tok_type == TOK_WORD) {
-			QStringList values;
-
-			tok_type = get_tok(in, value);
-			while (tok_type != TOK_END && tok_type != TOK_LINE_END) {
-				if (tok_type == TOK_WORD) values.append(value);
-				tok_type = get_tok(in, value);
-			}
-	   		
+		if (tok_type == Token::TOK_WORD) {
+			
+	   	QStringList values = getValues(in);
 	   	ConfNode node(key, values);
 	   	currTree->add(node);
 
@@ -123,19 +124,19 @@ void A2Config::parse(QString conf, QTextStream& in)
 	   		QString::compare(key, "IncludeOptional") == 0 ) {
 
 	   			for(QString val: values)
-	   				parseFile(val, conf);
+	   				parseFile(val, currTree);
 	   	}
 
 		}
 
-		tok_type = get_tok(in, key);
-	}
+	} while (tok_type != Token::TOK_END);
 
-	configTree.printTree();
+
+	return configTree;
 
 }
 
-int A2Config::get_tok(QTextStream& in, QString& token)
+Token A2Config::get_tok(QTextStream& in, QString& token)
 {
 	token = "";
 	QChar ch;
@@ -153,44 +154,44 @@ int A2Config::get_tok(QTextStream& in, QString& token)
 
 		if (word && (ch.isSpace() || ch == '<' || ch == '>')) {
 			prev = ch;
-			return TOK_WORD; 
+			return Token::TOK_WORD; 
 		}
 
-		if (ch == '\n') {
-			return TOK_LINE_END;
+		else if (ch == '\n') {
+			return Token::TOK_LINE_END;
 		}
 
-		if (ch == '\'' || ch == '\"') {
+		else if (ch == '\'' || ch == '\"') {
 			QChar nextCh;
 			while (!in.atEnd()) {
 				nextCh = in.read(1).at(0);
 				if (nextCh == ch) break;
 				token.append(nextCh);
 			}
-			return TOK_WORD;
+			return Token::TOK_WORD;
 		}
 
-		if (ch == '#') {
+		else if (ch == '#') {
 			in.readLine();
 			continue;
 		}
 
-		if (ch.isSpace()) {
+		else if (ch.isSpace()) {
 			continue;
 		}
 
-		if (ch == '<'){
+		else if (ch == '<'){
 			QChar nextCh;
 			nextCh = in.read(1).at(0);
 			if (nextCh == '/') {
-				return TOK_CLOSE_TAG; 
+				return Token::TOK_CLOSE_TAG; 
 			}else {
 				prev = nextCh;
-				return TOK_OPEN_ANGLE;
+				return Token::TOK_OPEN_ANGLE;
 			}
 		}
-		if (ch == '>'){
-			return TOK_CLOSE_ANGLE; 
+		else if (ch == '>'){
+			return Token::TOK_CLOSE_ANGLE; 
 		}
 		
 		token.append(ch);
@@ -198,15 +199,26 @@ int A2Config::get_tok(QTextStream& in, QString& token)
 		
 	}
 
-	if (word) return TOK_WORD;
+	if (word) return Token::TOK_WORD;
 
-	return TOK_END;
+	return Token::TOK_END;
 }
 
 QList<VHost> A2Config::getVhosts()
 {
-	QList<VHost> lst;
-	return lst;
+	QList<VHost> vhosts;
+	QList<ConfNode> vhost_nodes = this->configTree->getNodes("VirtualHost", NodeType::TAG);
+
+	for(auto node: vhost_nodes){
+		VHost vhost;
+		ConfTree* vhost_node = node.parent->subtrees[node.id];
+		vhost.name = vhost_node->getValue("ServerName");
+		vhost.docRoot = vhost_node->getValue("DocumentRoot");
+
+		vhosts.append(vhost);
+	}
+
+	return vhosts;
 }
 
 

@@ -1,9 +1,7 @@
 #pragma once
 
-class VHost
+struct VHost
 {
-public:
-	VHost();
-	~VHost();
-	
+	QString name;
+	QString docRoot;
 };

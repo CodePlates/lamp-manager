@@ -1,84 +1,33 @@
+#pragma once
 
-//typedef QMap<QString, QStringList> ConfDict;
-//typedef QList<ConfDict*> Tag;
-
-struct ConfNode {
-	QString key;
-	QStringList values;
-
-	ConfNode() {
-	}
-
-	ConfNode(QString key): key(key) {}
-
-	ConfNode(QString key, QStringList values): 
-		key(key), values(values) {}
-
-	void print()
-	{
-		QTextStream out(stdout);
-		
-		out << "\t" << key << ":";
-
-		for (QString val: values)
-			out << " [" << val << "]";
-
-		out << endl;
-	
-	}
-};
+#include <QHash>
+#include "conf_node.hpp"
 
 class ConfTree
 {
 private:
+	QString m_filepath;
 	QList<ConfNode> nodes;
-	QString tag; 
-	QStringList tagValues;
-	QList<ConfTree*> subtrees;
 
 public:
-	ConfTree() {
-		tag = "ROOT";
-	}
-	
-	ConfTree(QString tag): tag(tag) {
-	}
+	QHash<int, ConfTree*> subtrees;
+	ConfTree();
+	ConfTree(QString filepath);
+	~ConfTree();
 
-	~ConfTree() {
-		for(auto tree : subtrees)
-		{
-			delete tree;
-		}
-	}
+	inline QString getFilepath() { return this->m_filepath; }
+	inline void setFilepath(QString path) { this->m_filepath = path; }
 
-	void add(ConfNode node) {
-		nodes.append(node);
-	}
-
-	void add(ConfTree* tree) {
-		subtrees.append(tree);
-	}
-
-	void setTagValues(QStringList values) {
-		tagValues = values;
-	}
-
-
-	void printTree() 
+	void add(ConfNode node);
+	ConfTree* addTag(ConfNode tagNode);
+	void addTree(ConfTree* tree);
+	QList<ConfNode> getNodes(QString key, NodeType type = NodeType::KEYVAL);
+	inline QString getValue(QString key)
 	{
-		QTextStream out(stdout);
-
-		out << tag;
-		for (QString tval : tagValues)
-			out << " : " << tval;
-		out << endl;
-
-		for (ConfNode node: nodes) {
-			node.print();
-		}
-
-		for (ConfTree* tree: subtrees)
-			tree->printTree();
+		return getNodes(key).value(0).values.value(0);
 	}
+
+	
+	void printTree();
 
 };
