@@ -22,11 +22,7 @@ public:
 	ConfTree* addTag(ConfNode tagNode);
 	void addTree(ConfTree* tree);
 	QList<ConfNode> getNodes(QString key, NodeType type = NodeType::KEYVAL);
-	inline QString getValue(QString key)
-	{
-		return getNodes(key).value(0).values.value(0);
-	}
-
+	QString getValue(QString key, QString defaultVal = QString());
 	
 	void printTree();
 

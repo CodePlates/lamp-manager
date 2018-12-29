@@ -212,7 +212,7 @@ QList<VHost> A2Config::getVhosts()
 	for(auto node: vhost_nodes){
 		VHost vhost;
 		ConfTree* vhost_node = node.parent->subtrees[node.id];
-		vhost.name = vhost_node->getValue("ServerName");
+		vhost.name = vhost_node->getValue("ServerName", "localhost");
 		vhost.docRoot = vhost_node->getValue("DocumentRoot");
 
 		vhosts.append(vhost);

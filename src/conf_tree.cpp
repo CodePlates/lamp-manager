@@ -56,6 +56,15 @@ QList<ConfNode> ConfTree::getNodes(QString key, NodeType type)
 	return results;
 }
 
+QString ConfTree::getValue(QString key, QString defaultVal)
+{
+	QList<ConfNode> nodes = getNodes(key);
+	if (nodes.length() > 0)
+		return nodes.at(0).values.value(0);
+	else
+		return defaultVal;
+}
+
 void ConfTree::printTree() 
 {
 	QTextStream out(stdout);
