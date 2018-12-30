@@ -1,6 +1,7 @@
 #include <QFile>
 #include <QDirIterator>
 #include <QStack>
+#include <cstdio>
 #include "include/apache_config.hpp"
 
 
@@ -17,7 +18,31 @@ A2Config::~A2Config()
 
 QString A2Config::findConf()
 {
-	return "/etc/apache2/apache2.conf";
+	QString data, conf;
+	int i;
+	char buffer[256];
+	const char* cmd = "apachectl -V 2>&1";
+
+	FILE* stream = popen(cmd, "r");
+	if (stream) {
+		while (!feof(stream)) {
+			if (fgets(buffer, 256, stream) != NULL) 
+				data.append(buffer);
+		}
+		pclose(stream);
+	}
+
+	i = data.indexOf("HTTPD_ROOT=");
+	for (i = i+12; data.at(i) != '"'; i++)
+		conf.append(data.at(i));
+
+	if (conf.at(conf.length() - 1) != '/') conf.append('/');
+
+	i = data.indexOf("SERVER_CONFIG_FILE=");
+	for (i = i+20; data.at(i) != '"'; i++)
+		conf.append(data.at(i));
+
+	return conf;
 }
 
 void A2Config::parseFile(QString path, ConfTree* parent)

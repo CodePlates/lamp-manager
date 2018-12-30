@@ -25,6 +25,8 @@ PageVhosts::PageVhosts(QWidget *parent)
  	table = new QTableView();
 	table->setModel(model);
 	table->horizontalHeader()->setStretchLastSection(true);
+	table->setSelectionBehavior(QAbstractItemView::SelectRows);
+	table->setSelectionMode(QAbstractItemView::SingleSelection);
 	table->resizeColumnsToContents();
 	table->show();
 
