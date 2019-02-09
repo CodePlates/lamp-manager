@@ -11,5 +11,6 @@ private:
 public:
 	PageVhosts(QWidget *parent = 0);
 	~PageVhosts();
+	void onAddVHostClicked();
 	
 };

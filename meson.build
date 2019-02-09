@@ -11,7 +11,8 @@ src_files = [
 	'src/lampman.cpp', 
 	'src/page_cpanel.cpp', 
 	'src/page_php.cpp', 
-	'src/page_vhosts.cpp'
+	'src/page_vhosts.cpp',
+	'src/add_vhost_dialog.cpp'
 ]
 
 executable('lampman', src_files,

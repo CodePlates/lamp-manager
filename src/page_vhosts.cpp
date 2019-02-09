@@ -1,14 +1,26 @@
 #include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QPushButton>
 #include <QHeaderView>
 #include <QList>
 #include "include/page_vhosts.hpp"
 #include "include/conf_node.hpp"
 #include "include/apache_config.hpp"
 #include "include/vhost.hpp"
+#include <QTextStream>
+#include "include/add_vhost_dialog.hpp"
 
 PageVhosts::PageVhosts(QWidget *parent)
 {
-	QVBoxLayout *vbox = new QVBoxLayout;
+	QVBoxLayout* vbox = new QVBoxLayout;
+	QHBoxLayout* headerHbox = new QHBoxLayout;
+	QPushButton* addVHBtn = new QPushButton("Add VirtualHost");
+	headerHbox->addWidget(addVHBtn, 0, Qt::AlignRight);
+
+	connect(addVHBtn, &QPushButton::clicked, this, &PageVhosts::onAddVHostClicked);
+
+	vbox->addLayout(headerHbox);
+
 	model = new QStandardItemModel();
 
 	A2Config a2config;
@@ -37,4 +49,16 @@ PageVhosts::PageVhosts(QWidget *parent)
 PageVhosts::~PageVhosts()
 {
 	
+}
+
+void PageVhosts::onAddVHostClicked()
+{
+	AddVHostDialog* dialog = new AddVHostDialog(this);
+	dialog->exec();
+
+	if (dialog->result() == QDialog::Accepted) {
+		QTextStream out(stdout);
+		VHost vh = dialog->getVHost();
+		out << vh.name << " : " << vh.docRoot << endl;
+	}
 }
