@@ -18,8 +18,11 @@ class A2Config
 {
 private:
 	QStringList configs;
+	static QString apacheConf;
+	static QString apacheRoot;
 
-	QString findConf();
+	static void findConf();
+	void processConf();
 	Token get_tok(QTextStream& in, QString& token);
 	void parseFile(QString path, ConfTree* parent = nullptr);
 	ConfTree* parse(QString conf, QTextStream& in);
@@ -30,5 +33,6 @@ public:
 	A2Config();
 	~A2Config();
 	QList<VHost> getVhosts();
+	static QString getAvailableSitesFolder();
 
 };

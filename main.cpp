@@ -2,7 +2,7 @@
 #include <vector>
 #include <memory>
 #include "include/lampman.hpp"
-
+#include <QTextStream>
 
 int main(int argc, char *argv[])
 {

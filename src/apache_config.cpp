@@ -4,19 +4,27 @@
 #include <cstdio>
 #include "include/apache_config.hpp"
 
+QString A2Config::apacheConf = "";
+QString A2Config::apacheRoot = "";
 
 A2Config::A2Config()
 {
-	QString conf = this->findConf();
-	configs.append(conf);
-	parseFile(conf);
+	this->processConf();
 }
 
 A2Config::~A2Config()
 {
 }
 
-QString A2Config::findConf()
+void A2Config::processConf()
+{
+	if (apacheConf.isEmpty())
+		findConf();
+	configs.append(apacheConf);
+	parseFile(apacheConf);
+}
+
+void A2Config::findConf()
 {
 	QString data, conf;
 	int i;
@@ -34,15 +42,31 @@ QString A2Config::findConf()
 
 	i = data.indexOf("HTTPD_ROOT=");
 	for (i = i+12; data.at(i) != '"'; i++)
-		conf.append(data.at(i));
-
-	if (conf.at(conf.length() - 1) != '/') conf.append('/');
+		apacheRoot.append(data.at(i));
 
 	i = data.indexOf("SERVER_CONFIG_FILE=");
 	for (i = i+20; data.at(i) != '"'; i++)
 		conf.append(data.at(i));
 
-	return conf;
+	apacheConf = apacheRoot;
+	if (apacheConf.at(apacheConf.length() - 1) != '/') apacheConf.append('/');
+	apacheConf.append(conf);
+
+}
+
+QString A2Config::getAvailableSitesFolder()
+{
+	if (apacheRoot.isEmpty()) 
+		findConf();
+
+	QString path = apacheRoot;
+	if (path.at(path.length() - 1) != '/') 
+		path.append('/');
+
+	if (QDir(path.append("sites-available")).exists())
+		return path;
+	else 
+		return QString::null;
 }
 
 void A2Config::parseFile(QString path, ConfTree* parent)
