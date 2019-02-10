@@ -1,6 +1,5 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <QPushButton>
 #include <QHeaderView>
 #include <QList>
 #include <QDir>
@@ -14,17 +13,68 @@
 
 PageVhosts::PageVhosts(QWidget *parent)
 {
+	selectedRow = -1;
 	QVBoxLayout* vbox = new QVBoxLayout;
-	QHBoxLayout* headerHbox = new QHBoxLayout;
+	QHBoxLayout* bodyHbox = new QHBoxLayout;
+
+	loadVHostsModel();
+ 
+ 	table = new QTableView();
+	table->setModel(model);
+	table->horizontalHeader()->setStretchLastSection(true);
+	table->setSelectionBehavior(QAbstractItemView::SelectRows);
+	table->setSelectionMode(QAbstractItemView::SingleSelection);
+	table->resizeColumnsToContents();
+	table->show();
+
+	QVBoxLayout* tactionsVbox = new QVBoxLayout;
 	QPushButton* addVHBtn = new QPushButton("Add VirtualHost");
-	headerHbox->addWidget(addVHBtn, 0, Qt::AlignRight);
+	editVhostBtn = new QPushButton("Edit VirtualHost");
+	delVhostBtn = new QPushButton("Delete VirtualHost");
+
+	editVhostBtn->setEnabled(false);
+	delVhostBtn->setEnabled(false);
+
+	tactionsVbox->addWidget(addVHBtn);
+	tactionsVbox->addSpacing(20);
+	tactionsVbox->addWidget(editVhostBtn);
+	tactionsVbox->addWidget(delVhostBtn);
+	tactionsVbox->addStretch(1);
 
 	connect(addVHBtn, &QPushButton::clicked, this, &PageVhosts::onAddVHostClicked);
+	//connect(table, &QTableView::selectionChanged, this, &PageVhosts::onTableItemUnselected);
+	connect(table, &QTableView::clicked, this, &PageVhosts::onTableItemSelected);
 
-	vbox->addLayout(headerHbox);
+	bodyHbox->addWidget(table);
+	bodyHbox->addLayout(tactionsVbox);
+   vbox->addLayout(bodyHbox);
+	setLayout(vbox);
+}
 
+// void PageVhosts::onTableItemUnselected(const QItemSelection &selected, const QItemSelection &deselected)
+// {
+// 	qDebug() << "Unselected";
+// }
+
+void PageVhosts::onTableItemSelected(const QModelIndex &index)
+{
+	
+	QItemSelectionModel *selectionModel = table->selectionModel();
+	if (selectionModel->hasSelection()){
+		QModelIndexList indexes = selectionModel->selectedRows();
+		selectedRow = indexes.at(0).row();
+		editVhostBtn->setEnabled(true);
+		delVhostBtn->setEnabled(true);
+	}else{
+		editVhostBtn->setEnabled(false);
+		delVhostBtn->setEnabled(false);
+	}
+	
+}
+
+void PageVhosts::loadVHostsModel()
+{
 	model = new QStandardItemModel();
-
 	A2Config a2config;
 	QList<VHost> vhosts = a2config.getVhosts();
 
@@ -35,17 +85,6 @@ PageVhosts::PageVhosts(QWidget *parent)
       model->setItem(row, 0, new QStandardItem(vhost.name));
       model->setItem(row, 1, new QStandardItem(vhost.docRoot));
    }
- 
- 	table = new QTableView();
-	table->setModel(model);
-	table->horizontalHeader()->setStretchLastSection(true);
-	table->setSelectionBehavior(QAbstractItemView::SelectRows);
-	table->setSelectionMode(QAbstractItemView::SingleSelection);
-	table->resizeColumnsToContents();
-	table->show();
-
-   vbox->addWidget(table);
-	setLayout(vbox);
 }
 
 PageVhosts::~PageVhosts()
