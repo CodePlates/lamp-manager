@@ -32,8 +32,8 @@ SubtreeNode::SubtreeNode(QString key) :
 
 SubtreeNode::~SubtreeNode()
 {
-	// for (ConfTree* tree : m_trees)
-	// 	delete tree;
+	for (ConfTree* tree : m_trees)
+		delete tree;
 }
 
 void SubtreeNode::addTree(ConfTree* tree)
@@ -64,7 +64,8 @@ TagNode::TagNode(QString key, QStringList values) :
 
 TagNode::~TagNode()
 {
-
+	for (ConfNode* node : m_nodes)
+		delete node;
 }
 
 void TagNode::addNode(ConfNode* node)

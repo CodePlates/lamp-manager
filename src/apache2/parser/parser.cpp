@@ -20,6 +20,7 @@ namespace A2Parser {
 		
 		ConfNode* node;
 		while((node = getNext(in, fileinfo)) != nullptr){
+			node->setParent(configTree);
 			configTree->add(node);
 		}
 

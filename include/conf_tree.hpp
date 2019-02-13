@@ -21,7 +21,5 @@ public:
 	void add(ConfNode* node);
 	QList<ConfNode*> getNodes(QString key, NodeType type = NodeType::KEYVAL);
 	QString getValue(QString key, QString defaultVal = QString());
-	
-	void printTree();
 
 };

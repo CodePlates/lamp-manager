@@ -104,6 +104,7 @@ void PageVhosts::onEditVHostClicked()
 {
 	VHostDialog dialog(this);
 	VHost vh = vhosts.at(selectedRow);
+	qDebug() << vh.name << " : " << vh.conf;
 	dialog.setVHost(vh);
 	dialog.exec();
 }

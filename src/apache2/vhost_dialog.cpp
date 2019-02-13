@@ -64,5 +64,4 @@ void VHostDialog::setVHost(VHost& vh)
 
 VHostDialog::~VHostDialog()
 {
-	qDebug() << "VHost dialog deleted";
 }

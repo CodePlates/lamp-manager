@@ -6,8 +6,8 @@ VHost::VHost()
 
 }
 
-VHost::VHost(QString name, QString docRoot) :
-	name(name), docRoot(docRoot)
+VHost::VHost(QString name, QString docRoot, QString conf) :
+	name(name), docRoot(docRoot), conf(conf)
 {
 
 }
@@ -43,6 +43,7 @@ bool VHost::save()
     	QTextStream outstream(&file);
     	outstream << conf;
     	file.close();
+    	conf = filepath;
    }else 
    	return false;
 
