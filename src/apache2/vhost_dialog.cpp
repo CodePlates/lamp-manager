@@ -5,9 +5,9 @@
 #include <QFormLayout>
 #include <QFileDialog>
 #include <QDialogButtonBox>
-#include "include/add_vhost_dialog.hpp"
+#include "include/vhost_dialog.hpp"
 
-AddVHostDialog::AddVHostDialog(QWidget *parent) :
+VHostDialog::VHostDialog(QWidget *parent) :
 	QDialog(parent)
 {
 	//setTitle("Add Virtual Host");
@@ -33,27 +33,36 @@ AddVHostDialog::AddVHostDialog(QWidget *parent) :
 	QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok);
 	vbox->addWidget(buttonBox);
 
-	connect(browseBtn, &QPushButton::clicked, this, &AddVHostDialog::onBrowseBtnClicked);
+	connect(browseBtn, &QPushButton::clicked, this, &VHostDialog::onBrowseBtnClicked);
 	connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
    connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
    setLayout(vbox);
 }
 
-void AddVHostDialog::onBrowseBtnClicked()
+void VHostDialog::onBrowseBtnClicked()
 {
 	QFileDialog dialog(this);
 	dialog.setFileMode(QFileDialog::AnyFile);
 }
 
-VHost AddVHostDialog::getVHost()
+VHost* VHostDialog::getVHost()
 {
-	VHost vh;
-	vh.name = this->nameEdit->text();
-	vh.docRoot = this->docRootEdit->text();
-	return vh;
+	if (vhost == nullptr){
+		vhost = new VHost();
+	}
+	vhost->name = nameEdit->text();
+	vhost->docRoot = docRootEdit->text();
+	return vhost;
 }
 
-AddVHostDialog::~AddVHostDialog()
+void VHostDialog::setVHost(VHost& vh)
 {
+	vhost = &vh;
+	nameEdit->setText(vh.name);
+	docRootEdit->setText(vh.docRoot);
+}
 
+VHostDialog::~VHostDialog()
+{
+	qDebug() << "VHost dialog deleted";
 }

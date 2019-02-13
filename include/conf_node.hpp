@@ -1,40 +1,38 @@
 #pragma once 
 
-#include <QTextStream>
+#include <QStringList>
+#include "include/conf_node_base.hpp"
+#include "include/conf_tree.hpp"
 
-class ConfTree;
 
-enum class NodeType { KEYVAL, TAG, SUBTREE };
+class KeyvalNode : public ConfNode
+{
 
-static int nodecount = 0;
+public:
+	KeyvalNode(QString key, QStringList values);
+	~KeyvalNode();
+	QList<ConfNode*> get(QString key, NodeType type);
+};
 
-struct ConfNode {
-	NodeType type;
-	QString key;
-	QStringList values;
-	int id;
-	ConfTree* parent = nullptr;
+class SubtreeNode : public ConfNode
+{
+private:
+	QList<ConfTree*> m_trees;
+public:
+	SubtreeNode(QString key);
+	~SubtreeNode();
+	void addTree(ConfTree* tree);
+	QList<ConfNode*> get(QString key, NodeType type);
+};
 
-	ConfNode() {
-		id = nodecount++;
-	}
-
-	ConfNode(QString key, QStringList values): 
-		key(key), values(values) 
-	{
-		id = nodecount++;
-	}
-
-	void print(QString tab = "")
-	{
-		QTextStream out(stdout);
-		
-		out << tab << key << ":";
-
-		for (QString val: values)
-			out << " [" << val << "]";
-
-		out << endl;
-	
-	}
+class TagNode : public ConfNode
+{
+private:
+	QList<ConfNode*> m_nodes;
+public:
+	TagNode(QString key, QStringList values);
+	~TagNode();
+	void addNode(ConfNode* node);
+	QList<ConfNode*> get(QString key, NodeType type);
+	QString getValue(QString key, QString defaultVal = QString());
 };

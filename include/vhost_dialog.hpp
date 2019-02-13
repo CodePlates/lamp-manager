@@ -4,15 +4,17 @@
 #include <QDialog>
 #include "include/vhost.hpp"
 
-class AddVHostDialog : public QDialog {
+class VHostDialog : public QDialog {
 private:
+	VHost* vhost;
 	QLineEdit* nameEdit;
 	QLineEdit* docRootEdit;
 public:
-	AddVHostDialog(QWidget *parent = 0);
-	~AddVHostDialog();
+	VHostDialog(QWidget *parent = 0);
+	~VHostDialog();
 	void onBrowseBtnClicked();
 	void onCancelBtnClicked();
 	void onOkayBtnClicked();
-	VHost getVHost();
+	void setVHost(VHost& vh);
+	VHost* getVHost();
 };

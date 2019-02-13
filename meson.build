@@ -6,13 +6,17 @@ inc = include_directories('include')
 
 src_files = [ 
 	'main.cpp', 
-	'src/apache_config.cpp', 
-	'src/conf_tree.cpp', 
 	'src/lampman.cpp', 
 	'src/page_cpanel.cpp', 
 	'src/page_php.cpp', 
 	'src/page_vhosts.cpp',
-	'src/add_vhost_dialog.cpp'
+	'src/apache2/apache_config.cpp', 
+	'src/apache2/vhost.cpp',
+	'src/apache2/vhost_dialog.cpp',
+	'src/apache2/parser/conf_node_base.cpp',
+	'src/apache2/parser/conf_node.cpp',
+	'src/apache2/parser/conf_tree.cpp',
+	'src/apache2/parser/parser.cpp', 
 ]
 
 executable('lampman', src_files,
