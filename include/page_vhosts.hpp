@@ -15,7 +15,7 @@ private:
 	int selectedRow;
 	QList<VHost*> vhosts;
 	QTableView* table;
-	QStandardItemModel* model;
+	QStandardItemModel* model = nullptr;
 	QPushButton* editVhostBtn;
 	QPushButton* delVhostBtn;
 public:

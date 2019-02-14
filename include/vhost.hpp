@@ -11,7 +11,7 @@ public:
 	QString docRoot;
 public:
 	VHost();
-	VHost(QString name, QString docRoot, QString conf);
+	//VHost(QString& conf, QString& name, QString& docRoot);
 	~VHost();
 	bool save();
 	bool update();

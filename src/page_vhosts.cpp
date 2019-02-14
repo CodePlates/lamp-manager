@@ -44,6 +44,7 @@ PageVhosts::PageVhosts(QWidget *parent)
 	connect(selectionModel, &QItemSelectionModel::selectionChanged, this, &PageVhosts::onTableItemSelected);
 	connect(addVHBtn, &QPushButton::clicked, this, &PageVhosts::onAddVHostClicked);
 	connect(editVhostBtn, &QPushButton::clicked, this, &PageVhosts::onEditVHostClicked);
+	connect(delVhostBtn, &QPushButton::clicked, this, &PageVhosts::onDelVHostClicked);
 	//connect(table, &QTableView::clicked, this, &PageVhosts::onTableItemSelected);
 
 
@@ -55,7 +56,6 @@ PageVhosts::PageVhosts(QWidget *parent)
 
 void PageVhosts::onTableItemSelected(const QItemSelection &selected, const QItemSelection &deselected)
 {
-	
 	QItemSelectionModel *selectionModel = table->selectionModel();
 	if (selectionModel->hasSelection()){
 		QModelIndexList indexes = selectionModel->selectedRows();
@@ -120,5 +120,11 @@ void PageVhosts::onEditVHostClicked()
 
 void PageVhosts::onDelVHostClicked()
 {
-
+	VHost* vh = vhosts.at(selectedRow);
+	if (vh->destroy()) {
+		vhosts.removeAt(selectedRow);
+		model->removeRow(selectedRow);
+		table->selectionModel()->clearSelection();
+		selectedRow = -1;
+	}
 }

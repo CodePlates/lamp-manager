@@ -1,16 +1,17 @@
 #include "include/vhost.hpp"
 #include "include/apache_config.hpp"
+#include <QFileInfo>
 
 VHost::VHost()
 {
 
 }
 
-VHost::VHost(QString name, QString docRoot, QString conf) :
-	name(name), docRoot(docRoot), conf(conf)
-{
+// VHost::VHost(QString& conf, QString& name, QString& docRoot) :
+// 	name(name), docRoot(docRoot), conf(conf)
+// {
 
-}
+// }
 
 VHost::~VHost()
 {
@@ -73,10 +74,23 @@ bool VHost::update()
 
 bool VHost::disable()
 {
+	char cmd[50];
+	QFileInfo info(conf);
+   sprintf(cmd, "a2dissite %s 2>&1", info.fileName().toStdString().c_str());
+
+   FILE* stream = popen(cmd, "r");
+	if (stream) {
+		pclose(stream);
+	}
+
 	return true;
 }
 
 bool VHost::destroy()
 {
+	disable();
+	QFile(conf).remove();
+
+	popen("apachectl -k graceful", "r");
 	return true;
 }
