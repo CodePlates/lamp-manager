@@ -6,7 +6,7 @@
 
 class VHostDialog : public QDialog {
 private:
-	VHost* vhost;
+	VHost* vhost = nullptr;
 	QLineEdit* nameEdit;
 	QLineEdit* docRootEdit;
 public:
@@ -15,6 +15,6 @@ public:
 	void onBrowseBtnClicked();
 	void onCancelBtnClicked();
 	void onOkayBtnClicked();
-	void setVHost(VHost& vh);
+	void setVHost(VHost* vh);
 	VHost* getVHost();
 };

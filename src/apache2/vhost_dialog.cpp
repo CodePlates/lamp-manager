@@ -10,7 +10,6 @@
 VHostDialog::VHostDialog(QWidget *parent) :
 	QDialog(parent)
 {
-	//setTitle("Add Virtual Host");
 
 	QVBoxLayout *vbox = new QVBoxLayout;
 	
@@ -55,11 +54,11 @@ VHost* VHostDialog::getVHost()
 	return vhost;
 }
 
-void VHostDialog::setVHost(VHost& vh)
+void VHostDialog::setVHost(VHost* vh)
 {
-	vhost = &vh;
-	nameEdit->setText(vh.name);
-	docRootEdit->setText(vh.docRoot);
+	vhost = vh;
+	nameEdit->setText(vh->name);
+	docRootEdit->setText(vh->docRoot);
 }
 
 VHostDialog::~VHostDialog()

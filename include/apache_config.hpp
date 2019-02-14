@@ -20,6 +20,6 @@ public:
 	A2Config();
 	~A2Config();
 	static QString getAvailableSitesFolder();
-	QList<VHost> getVhosts();
+	QList<VHost*> getVhosts();
 
 };

@@ -6,6 +6,9 @@
 #include <QTextStream>
 #include "include/vhost_dialog.hpp"
 #include <cstdio>
+#include <QItemSelectionModel>
+#include <QItemSelection>
+
 
 PageVhosts::PageVhosts(QWidget *parent)
 {
@@ -37,9 +40,12 @@ PageVhosts::PageVhosts(QWidget *parent)
 	tactionsVbox->addWidget(delVhostBtn);
 	tactionsVbox->addStretch(1);
 
+	QItemSelectionModel *selectionModel = table->selectionModel();
+	connect(selectionModel, &QItemSelectionModel::selectionChanged, this, &PageVhosts::onTableItemSelected);
 	connect(addVHBtn, &QPushButton::clicked, this, &PageVhosts::onAddVHostClicked);
 	connect(editVhostBtn, &QPushButton::clicked, this, &PageVhosts::onEditVHostClicked);
-	connect(table, &QTableView::clicked, this, &PageVhosts::onTableItemSelected);
+	//connect(table, &QTableView::clicked, this, &PageVhosts::onTableItemSelected);
+
 
 	bodyHbox->addWidget(table);
 	bodyHbox->addLayout(tactionsVbox);
@@ -47,7 +53,7 @@ PageVhosts::PageVhosts(QWidget *parent)
 	setLayout(vbox);
 }
 
-void PageVhosts::onTableItemSelected(const QModelIndex &index)
+void PageVhosts::onTableItemSelected(const QItemSelection &selected, const QItemSelection &deselected)
 {
 	
 	QItemSelectionModel *selectionModel = table->selectionModel();
@@ -72,26 +78,29 @@ void PageVhosts::loadVHostsModel()
 	model->setHorizontalHeaderLabels({"Domain", "Documnet Root"});
    
    for (int row = 0; row < vhosts.length(); row++) {
-   	VHost vhost = vhosts[row];
-      model->setItem(row, 0, new QStandardItem(vhost.name));
-      model->setItem(row, 1, new QStandardItem(vhost.docRoot));
+   	VHost* vhost = vhosts.at(row);
+      model->setItem(row, 0, new QStandardItem(vhost->name));
+      model->setItem(row, 1, new QStandardItem(vhost->docRoot));
    }
 }
 
 PageVhosts::~PageVhosts()
 {
-	
+	for (VHost* vhost : vhosts)
+		delete vhost;
 }
 
 void PageVhosts::onAddVHostClicked()
 {
 	VHostDialog dialog(this);
+	dialog.setWindowTitle("Add VirtualHost");
 	dialog.exec();
 
 	if (dialog.result() == QDialog::Accepted) {
 		VHost* vh = dialog.getVHost();
 
 		if (vh->save()) {
+			vhosts.append(vh);
 			QList<QStandardItem*> cols;
 			cols << new QStandardItem(vh->name);
 			cols << new QStandardItem(vh->docRoot);
@@ -103,9 +112,9 @@ void PageVhosts::onAddVHostClicked()
 void PageVhosts::onEditVHostClicked()
 {
 	VHostDialog dialog(this);
-	VHost vh = vhosts.at(selectedRow);
-	qDebug() << vh.name << " : " << vh.conf;
+	VHost* vh = vhosts.at(selectedRow);
 	dialog.setVHost(vh);
+	dialog.setWindowTitle("Edit VirtualHost");
 	dialog.exec();
 }
 

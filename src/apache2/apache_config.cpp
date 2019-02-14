@@ -70,18 +70,19 @@ QString A2Config::getAvailableSitesFolder()
 		return QString::null;
 }
 
-QList<VHost> A2Config::getVhosts()
+QList<VHost*> A2Config::getVhosts()
 {
-	QList<VHost> vhosts;
+	QList<VHost*> vhosts;
 	QList<ConfNode*> vhost_nodes = configTree->getNodes("VirtualHost", NodeType::TAG);
 
-	for(auto node: vhost_nodes){
-		VHost vhost;
+	for(auto node: vhost_nodes) {
+
+		VHost* vhost = new VHost();
 
 		TagNode* tag = (TagNode*) node;
-		vhost.name = tag->getValue("ServerName", "localhost");
-		vhost.docRoot = tag->getValue("DocumentRoot");
-		vhost.conf = tag->parent->getFilepath();
+		vhost->name = tag->getValue("ServerName", "localhost");
+		vhost->docRoot = tag->getValue("DocumentRoot");
+		vhost->conf = tag->parent->getFilepath();
 		vhosts.append(vhost);
 	}
 

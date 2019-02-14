@@ -13,7 +13,7 @@
 class PageVhosts: public QWidget {
 private:
 	int selectedRow;
-	QList<VHost> vhosts;
+	QList<VHost*> vhosts;
 	QTableView* table;
 	QStandardItemModel* model;
 	QPushButton* editVhostBtn;
@@ -22,7 +22,7 @@ public:
 	PageVhosts(QWidget *parent = 0);
 	~PageVhosts();
 	void loadVHostsModel();
-	void onTableItemSelected(const QModelIndex &index);
+	void onTableItemSelected(const QItemSelection &selected, const QItemSelection &deselected);
 	void onAddVHostClicked();
 	void onEditVHostClicked();
 	void onDelVHostClicked();
