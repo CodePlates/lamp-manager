@@ -1,9 +1,10 @@
 #include <QApplication>
-#include <vector>
 #include <memory>
 #include "include/lampman.hpp"
-#include <QTextStream>
 #include <unistd.h>
+#include "utils.hpp"
+#include <QDebug>
+
 
 int main(int argc, char *argv[])
 {
@@ -21,5 +22,6 @@ int main(int argc, char *argv[])
 	window.show();
 
 	return app.exec();
+		
 
 }

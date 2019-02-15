@@ -1,5 +1,6 @@
 #include "include/vhost.hpp"
 #include "include/apache_config.hpp"
+#include "utils.hpp"
 #include <QFileInfo>
 
 VHost::VHost()
@@ -57,9 +58,13 @@ bool VHost::save()
 	}
 
 	QFile hostsfile("/etc/hosts");
-	if (hostsfile.open(QIODevice::Append | QIODevice::Text)) {
+	if (hostsfile.open(QIODevice::ReadWrite | QIODevice::Append)) {
     	QTextStream outstream(&hostsfile);
-    	outstream << "127.0.0.1	" << name;
+    	outstream.seek(outstream.pos() - 1);
+    	if (QString::compare(outstream.read(1), "\n") != 0){
+    		outstream << "\n";
+    	}
+    	outstream << "127.0.0.1	" << name << "\n";
     	hostsfile.close();
    }
 
@@ -69,6 +74,7 @@ bool VHost::save()
 
 bool VHost::update()
 {
+	
 	return true;
 }
 
@@ -92,5 +98,9 @@ bool VHost::destroy()
 	QFile(conf).remove();
 
 	popen("apachectl -k graceful", "r");
-	return true;
+
+	PatternsList patterns;
+	patterns.append({"^\\s*127.0.0.1\\s+" + name + "\\s*\n", ""});
+	file_replace("/etc/hosts", patterns);
+	return true; 
 }
