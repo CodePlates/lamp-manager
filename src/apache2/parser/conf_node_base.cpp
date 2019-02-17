@@ -1,7 +1,7 @@
 #include "include/conf_node_base.hpp"
 
 ConfNode::ConfNode(QString key, QStringList values) : 
-	parent(parent), m_key(key), m_values(values) 
+	m_key(key), m_values(values) 
 {}
 
 ConfNode::~ConfNode() 

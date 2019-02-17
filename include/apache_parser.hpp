@@ -1,25 +1,25 @@
 #pragma once
 
-#include <QFile>
-#include <QTextStream>
 #include "conf_tree.hpp"
 #include "conf_node.hpp"
+#include "apache_scanner.hpp"
 
-enum class Token {
-	TOK_END,
-	TOK_OPEN_ANGLE,
-	TOK_CLOSE_ANGLE,
-	TOK_CLOSE_TAG,
-	TOK_WORD,
-	TOK_LINE_END
+
+class A2Parser {
+private:
+	ConfTree* configTree;
+	Token curr_tok_type;
+	A2Scanner s;
+	QString conf;
+public:	
+	A2Parser(QString conf);
+	static ConfTree* parse(QString conf);
+	QStringList getValues();
+	QList<ConfTree*> parsePath(QString path);
+	inline bool isDone() { return curr_tok_type == Token::TOK_END; }
+	QList<ConfNode*> parseLines();
+	ConfNode* parseLine();
+	ConfNode* parseTag();
+	ConfNode* parseTree();
+	ConfNode* parseKeyval();
 };
-
-namespace A2Parser {
-
-	Token get_tok(QTextStream& in, QString& token);
-	QStringList getValues(QTextStream& in, bool tag = false);
-
-	ConfTree* parse(QString conf);
-	QList<ConfTree*> parsePath(QString path, QFileInfo& fileinfo);
-	ConfNode* getNext(QTextStream& in, QFileInfo& fileinfo);
-}

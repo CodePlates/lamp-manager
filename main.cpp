@@ -5,6 +5,9 @@
 #include "utils.hpp"
 #include <QDebug>
 
+#include "apache_scanner.hpp"
+#include "apache_parser.hpp"
+
 
 int main(int argc, char *argv[])
 {
@@ -22,6 +25,8 @@ int main(int argc, char *argv[])
 	window.show();
 
 	return app.exec();
-		
+	// A2Parser::parse("test.conf");
 
+
+		
 }

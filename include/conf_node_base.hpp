@@ -10,7 +10,7 @@ class ConfNode {
 public:
 	ConfTree* parent = nullptr;
 	NodeType m_type;
-	QString m_key;
+	QString m_key = QString();
 	QStringList m_values;
 	inline bool isNode(QString key, NodeType type) {
 		return (m_type == type && QString::compare(m_key, key) == 0);

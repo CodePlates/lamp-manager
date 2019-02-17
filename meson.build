@@ -17,6 +17,7 @@ src_files = [
 	'src/apache2/parser/conf_node_base.cpp',
 	'src/apache2/parser/conf_node.cpp',
 	'src/apache2/parser/conf_tree.cpp',
+	'src/apache2/parser/scanner.cpp', 
 	'src/apache2/parser/parser.cpp', 
 ]
 

@@ -15,6 +15,8 @@ ConfTree::~ConfTree() {
 }
 
 void ConfTree::add(ConfNode* node) {
+	qDebug() << node->getKey() << node->m_values;
+	node->setParent(this);
 	nodes.append(node);
 }
 
@@ -29,3 +31,4 @@ QList<ConfNode*> ConfTree::getNodes(QString key, NodeType type)
 
 	return results;
 }
+

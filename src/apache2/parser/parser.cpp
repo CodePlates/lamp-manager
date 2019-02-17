@@ -4,203 +4,149 @@
 #include <QDebug>
 
 // overrall my parser is very ugly and i will eventually just use bison
-namespace A2Parser {
+A2Parser::A2Parser(QString conf):
+	s(conf), conf(conf)
+{
+	
+}
 
-	ConfTree* parse(QString conf)
-	{
-		QFile file(conf);
-		QFileInfo fileinfo(conf);
-		if (!file.open(QIODevice::ReadOnly)) {
-			qWarning("Cannot open configuration file");
-			return nullptr;
-		}
+ConfTree* A2Parser::parse(QString conf)
+{
+	ConfTree* configTree = new ConfTree(conf);
+	A2Parser p(conf);
 
-		QTextStream in(&file);
-		ConfTree* configTree = new ConfTree(conf);
-		
-		ConfNode* node;
-		while((node = getNext(in, fileinfo)) != nullptr){
-			node->setParent(configTree);
+	QList<ConfNode*> nodelist = p.parseLines();
+	for (auto node: nodelist) {
+		if (node != nullptr)
 			configTree->add(node);
-		}
+	}
+		
+	return configTree;
+}
 
-		file.close();
+QList<ConfTree*> A2Parser::parsePath(QString path)
+{
+	QList<ConfTree*> lst;	
+	QFileInfo fileinfo(conf);
+	QString currFolder = fileinfo.dir().absolutePath();
+	if (currFolder.at(currFolder.length() - 1) != '/') currFolder.append('/');
 
-		return configTree;
+	if (!path.startsWith("/"))
+		path.prepend(currFolder);
+
+	QFileInfo info(path);
+	QDirIterator it(info.dir().absolutePath(), QStringList() << info.fileName());
+
+	while (it.hasNext()) {
+		QString conf = it.next();
+		ConfTree* tree = parse(conf);
+		lst.append(tree);
+	}
+	return lst;
+}
+
+QList<ConfNode*> A2Parser::parseLines()
+{
+	QList<ConfNode*> nodelist;
+	ConfNode* node = nullptr;
+	while((node = parseLine()) != nullptr){
+		nodelist.append(node);
+	}
+	return nodelist;
+}
+
+ConfNode* A2Parser::parseLine()
+{	
+
+	curr_tok_type = s.get_tok();
+
+	while (curr_tok_type == Token::TOK_LINE_END) {
+		curr_tok_type = s.get_tok();
+		continue;
 	}
 
-	ConfNode* getNext(QTextStream& in, QFileInfo& fileinfo)
-	{
-		QString key, value;		
-		Token tok_type;
+	if (curr_tok_type == Token::TOK_END)
+		return nullptr;
 		
+	ConfNode* result = parseTag();
+	return result;
+	
+}
+	
+
+
+ConfNode* A2Parser::parseTag()
+{
+
+	if (curr_tok_type == Token::TOK_OPEN_ANGLE) {
+		curr_tok_type = s.get_tok();
+		QString tag = s.currText;
+		QStringList values = getValues();
+		TagNode* tagNode = new TagNode(tag, values);
+
+		if (curr_tok_type == Token::TOK_CLOSE_ANGLE) {
+			s.get_tok();
+			QList<ConfNode*> nodelist2 = parseLines();
+			for (auto node3: nodelist2) {
+				tagNode->addNode(node3);
+			}		
+		} 
+		return tagNode;
 		
-		tok_type = get_tok(in, key);
+	}else if (curr_tok_type == Token::TOK_CLOSE_TAG) {
+		curr_tok_type = s.get_tok(); // tagname
+		curr_tok_type = s.get_tok(); // close angle
+		return nullptr;
+	}else {
+		return parseTree();
+	}
+}
+
+ConfNode* A2Parser::parseTree()
+{
+	if (curr_tok_type == Token::TOK_WORD) {
 		
-		while(tok_type == Token::TOK_LINE_END)
-			tok_type = get_tok(in, key);
+   	if (QString::compare(s.currText, "Include") == 0 || 
+   		QString::compare(s.currText, "IncludeOptional") == 0 ) {
+
+   			SubtreeNode* subtree = new SubtreeNode(s.currText);
+   			
+   			QStringList values = getValues();
+   			for(QString val: values) {
+   				QList<ConfTree*> treelist = parsePath(val);
+   				for (auto tree : treelist) {
+   					subtree->addTree(tree);
+   				}
+   			}
+   			return subtree;
+   	}
+   } 
+   	
+   return parseKeyval();
+}
 
 
-		if (tok_type == Token::TOK_END)
-			return nullptr;
+ConfNode* A2Parser::parseKeyval()
+{
+	if (curr_tok_type == Token::TOK_WORD) {
+   	QString key = s.currText;
+   	QStringList values = getValues();
+   	KeyvalNode* keynode = new KeyvalNode(key, values);
+   	return keynode;
 
-		if (tok_type == Token::TOK_OPEN_ANGLE) {
-			
-			tok_type = get_tok(in, key);
-			QStringList values = getValues(in, true);
-			
-			TagNode* tagNode = new TagNode(key, values);
-			
-			ConfNode* node;
-			while ((node = getNext(in, fileinfo)) != nullptr) {
-				tagNode->addNode(node);
-			}
-			return tagNode;
-			
-		}
-
-		if (tok_type == Token::TOK_CLOSE_TAG) {
-			while (tok_type != Token::TOK_END && tok_type != Token::TOK_CLOSE_ANGLE) {
-				//if (tok_type == Token::TOK_WORD) values.append(value);
-				tok_type = get_tok(in, value);
-			}
-			return nullptr;			
-		}
-		
-		if (tok_type == Token::TOK_WORD) {
-			
-	   	QStringList values = getValues(in);
-
-	   	if (QString::compare(key, "Include") == 0 || 
-	   		QString::compare(key, "IncludeOptional") == 0 ) {
-
-	   			SubtreeNode* subtree = new SubtreeNode(key);
-
-	   			for(QString val: values) {
-	   				QList<ConfTree*> treelist = parsePath(val, fileinfo);
-	   				for (auto tree : treelist) {
-	   					subtree->addTree(tree);
-	   				}
-	   			}
-	   			return subtree;
-	   	}
-	   	
-	   	KeyvalNode* keynode = new KeyvalNode(key, values);
-	   	return keynode;
-
-		}	
-
+	}else {
 		return nullptr;
 	}
-
-	QList<ConfTree*> parsePath(QString path, QFileInfo& fileinfo)
-	{
-		QList<ConfTree*> lst;	
-		QString currFolder = fileinfo.dir().absolutePath();
-		if (currFolder.at(currFolder.length() - 1) != '/') currFolder.append('/');
-
-		if (!path.startsWith("/"))
-			path.prepend(currFolder);
-
-		QFileInfo info(path);
-		QDirIterator it(info.dir().absolutePath(), QStringList() << info.fileName());
-
-		while (it.hasNext()) {
-			QString conf = it.next();
-			
-			ConfTree* tree = parse(conf);
-			lst.append(tree);
-		}
-		return lst;
-	}
-
-	QStringList getValues(QTextStream& in, bool tag) {
-		Token tok_type;
-		QString value;
-		QStringList values;
-		Token end = Token::TOK_LINE_END;
-
-		if (tag)
-			end = Token::TOK_CLOSE_ANGLE;
-
-		tok_type = get_tok(in, value);
-
-		while (tok_type != Token::TOK_END && tok_type != end) {
-			if (tok_type == Token::TOK_WORD) {
-				values.append(value);
-			}
-			tok_type = get_tok(in, value);
-		}
-
-		return values;
-	}
-
-	Token get_tok(QTextStream& in, QString& token)
-	{
-		token = "";
-		QChar ch;
-		bool word = false;
-		static QChar prev = '\0';
-
-		while (!in.atEnd()) {
-
-			if (prev == '\0')
-				ch = in.read(1).at(0);
-			else {
-				ch = prev;
-				prev = '\0';
-			}
-
-			if (word && (ch.isSpace() || ch == '<' || ch == '>')) {
-				prev = ch;
-				return Token::TOK_WORD; 
-			}
-
-			else if (ch == '\n') {
-				return Token::TOK_LINE_END;
-			}
-
-			else if (ch == '\'' || ch == '\"') {
-				QChar nextCh;
-				while (!in.atEnd()) {
-					nextCh = in.read(1).at(0);
-					if (nextCh == ch) break;
-					token.append(nextCh);
-				}
-				return Token::TOK_WORD;
-			}
-
-			else if (ch == '#') {
-				in.readLine();
-				continue;
-			}
-
-			else if (ch.isSpace()) {
-				continue;
-			}
-
-			else if (ch == '<'){
-				QChar nextCh;
-				nextCh = in.read(1).at(0);
-				if (nextCh == '/') {
-					return Token::TOK_CLOSE_TAG; 
-				}else {
-					prev = nextCh;
-					return Token::TOK_OPEN_ANGLE;
-				}
-			}
-			else if (ch == '>'){
-				return Token::TOK_CLOSE_ANGLE; 
-			}
-			
-			token.append(ch);
-			word = true;
-			
-		}
-
-		if (word) return Token::TOK_WORD;
-
-		return Token::TOK_END;
-	}
-
 }
+	
+QStringList A2Parser::getValues() {
+	QString value;
+	QStringList values;
+	while ((curr_tok_type = s.get_tok()) == Token::TOK_WORD) {
+		values.append(s.currText);
+	}
+	return values;
+}
+
+	
+

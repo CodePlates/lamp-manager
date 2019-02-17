@@ -84,11 +84,7 @@ bool VHost::disable()
 	QFileInfo info(conf);
    sprintf(cmd, "a2dissite %s 2>&1", info.fileName().toStdString().c_str());
 
-   FILE* stream = popen(cmd, "r");
-	if (stream) {
-		pclose(stream);
-	}
-
+   popen(cmd, "r");
 	return true;
 }
 
