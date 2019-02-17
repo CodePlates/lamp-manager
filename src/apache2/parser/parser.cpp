@@ -15,12 +15,10 @@ ConfTree* A2Parser::parse(QString conf)
 	ConfTree* configTree = new ConfTree(conf);
 	A2Parser p(conf);
 
-	QList<ConfNode*> nodelist = p.parseLines();
-	for (auto node: nodelist) {
-		if (node != nullptr)
-			configTree->add(node);
+	ConfNode* node = nullptr;
+	while((node = p.parseLine()) != nullptr) {
+		configTree->add(node);	
 	}
-		
 	return configTree;
 }
 
@@ -43,16 +41,6 @@ QList<ConfTree*> A2Parser::parsePath(QString path)
 		lst.append(tree);
 	}
 	return lst;
-}
-
-QList<ConfNode*> A2Parser::parseLines()
-{
-	QList<ConfNode*> nodelist;
-	ConfNode* node = nullptr;
-	while((node = parseLine()) != nullptr){
-		nodelist.append(node);
-	}
-	return nodelist;
 }
 
 ConfNode* A2Parser::parseLine()
@@ -86,16 +74,23 @@ ConfNode* A2Parser::parseTag()
 
 		if (curr_tok_type == Token::TOK_CLOSE_ANGLE) {
 			s.get_tok();
-			QList<ConfNode*> nodelist2 = parseLines();
-			for (auto node3: nodelist2) {
-				tagNode->addNode(node3);
-			}		
+			ConfNode* node = parseLine();
+			while (curr_tok_type != Token::TOK_END) {
+				if (curr_tok_type == Token::TOK_CLOSE_TAG) {
+					curr_tok_type = s.get_tok(); // tagname
+					curr_tok_type = s.get_tok(); // close angle			
+					return tagNode;
+				}else {
+					tagNode->addNode(node);
+					node = parseLine();
+				}
+			}
 		} 
-		return tagNode;
+		qDebug() << conf;
+		qWarning("Unexpected end of file."); exit(-1);
+		return nullptr;
 		
 	}else if (curr_tok_type == Token::TOK_CLOSE_TAG) {
-		curr_tok_type = s.get_tok(); // tagname
-		curr_tok_type = s.get_tok(); // close angle
 		return nullptr;
 	}else {
 		return parseTree();

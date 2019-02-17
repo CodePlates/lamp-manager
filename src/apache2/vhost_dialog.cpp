@@ -40,8 +40,10 @@ VHostDialog::VHostDialog(QWidget *parent) :
 
 void VHostDialog::onBrowseBtnClicked()
 {
-	QString dir = QFileDialog::getExistingDirectory(this, "Set Document Root");
-	docRootEdit->setText(dir);
+	QString initial = docRootEdit->text();
+	QString dir = QFileDialog::getExistingDirectory(this, "Set Document Root", initial);
+	if (!dir.isEmpty())
+		docRootEdit->setText(dir);
 }
 
 VHost* VHostDialog::getVHost()

@@ -83,7 +83,6 @@ QList<VHost*> A2Config::getVhosts()
 		vhost->name = tag->getValue("ServerName", "localhost");
 		vhost->docRoot = tag->getValue("DocumentRoot");
 		vhost->conf = tag->parent->getFilepath();
-		qDebug() << vhost->name;
 		vhosts.append(vhost);
 	}
 

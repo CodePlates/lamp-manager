@@ -8,7 +8,7 @@ A2Scanner::A2Scanner(QString filepath)
 	}
 	QTextStream in(&file);
 	contents = in.readAll();
-	contents.append("\n\n");
+	contents.append('\n');
 }
 
 Token A2Scanner::get_tok()

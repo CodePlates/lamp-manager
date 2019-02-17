@@ -31,7 +31,7 @@ bool VHost::save()
 						"\n"
 						"	ErrorLog ${APACHE_LOG_DIR}/error.log\n"
 						"	CustomLog ${APACHE_LOG_DIR}/access.log combined\n"
-						"</VirtualHost>";
+						"</VirtualHost>\n";
 				
 	conf.replace("%%domain%%", name);
 	conf.replace("%%docRoot%%", docRoot);
@@ -91,7 +91,10 @@ bool VHost::disable()
 bool VHost::destroy()
 {
 	disable();
-	QFile(conf).remove();
+	QString folder = A2Config::getAvailableSitesFolder();
+	QFileInfo info(conf);
+	QString filepath = folder.append("/").append(info.fileName());
+	QFile(filepath).remove();
 
 	popen("apachectl -k graceful", "r");
 

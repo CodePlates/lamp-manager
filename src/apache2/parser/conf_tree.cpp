@@ -15,7 +15,6 @@ ConfTree::~ConfTree() {
 }
 
 void ConfTree::add(ConfNode* node) {
-	qDebug() << node->getKey() << node->m_values;
 	node->setParent(this);
 	nodes.append(node);
 }

@@ -16,8 +16,6 @@ public:
 	static ConfTree* parse(QString conf);
 	QStringList getValues();
 	QList<ConfTree*> parsePath(QString path);
-	inline bool isDone() { return curr_tok_type == Token::TOK_END; }
-	QList<ConfNode*> parseLines();
 	ConfNode* parseLine();
 	ConfNode* parseTag();
 	ConfNode* parseTree();
