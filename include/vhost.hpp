@@ -15,6 +15,7 @@ public:
 	~VHost();
 	bool save();
 	bool update();
+	bool enable();
 	bool disable();
 	bool destroy();
 };

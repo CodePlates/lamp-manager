@@ -116,6 +116,15 @@ void PageVhosts::onEditVHostClicked()
 	dialog.setVHost(vh);
 	dialog.setWindowTitle("Edit VirtualHost");
 	dialog.exec();
+
+	if (dialog.result() == QDialog::Accepted) {
+		VHost* vh = dialog.getVHost();
+
+		if (vh->update()) {
+			model->item(selectedRow, 0)->setData(vh->name, Qt::DisplayRole);
+			model->item(selectedRow, 1)->setData(vh->docRoot, Qt::DisplayRole);
+		}
+	}
 }
 
 void PageVhosts::onDelVHostClicked()

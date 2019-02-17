@@ -22,7 +22,7 @@ VHost::~VHost()
 bool VHost::save()
 {
 	// this was planned to be in its own stub file
-	QString conf =	"<VirtualHost *:80>\n"
+	QString config =	"<VirtualHost *:80>\n"
 						"	ServerAdmin webmaster@localhost\n"
 						"	DocumentRoot %%docRoot%%\n"
 						"\n"
@@ -33,30 +33,26 @@ bool VHost::save()
 						"	CustomLog ${APACHE_LOG_DIR}/access.log combined\n"
 						"</VirtualHost>\n";
 				
-	conf.replace("%%domain%%", name);
-	conf.replace("%%docRoot%%", docRoot);
+	config.replace("%%domain%%", name);
+	config.replace("%%docRoot%%", docRoot);
 
-	QString folder = A2Config::getAvailableSitesFolder();
 	QString filename = QString(name).append(".conf");
+	QString folder = A2Config::getAvailableSitesFolder();
 	QString filepath = QString(folder).append("/").append(filename);
+
 
 	QFile file(filepath);
 	if (file.open(QIODevice::WriteOnly)) {
     	QTextStream outstream(&file);
-    	outstream << conf;
+    	outstream << config;
     	file.close();
     	conf = filepath;
    }else 
    	return false;
 
-   char cmd[50];
-   sprintf(cmd, "a2ensite %s 2>&1", filename.toStdString().c_str());
-
-	FILE* stream = popen(cmd, "r");
-	if (stream) {
-		pclose(stream);
-	}
-
+   
+   enable();
+	
 	QFile hostsfile("/etc/hosts");
 	if (hostsfile.open(QIODevice::ReadWrite | QIODevice::Append)) {
     	QTextStream outstream(&hostsfile);
@@ -74,7 +70,27 @@ bool VHost::save()
 
 bool VHost::update()
 {
-	
+	disable();
+	QFileInfo info(conf);
+	PatternsList patterns;
+	patterns.append({"^(\\s*ServerName\\s+).*\n", "\\1" + name + "\n"});
+	patterns.append({"^(\\s*DocumentRoot\\s+).*\n", "\\1" + docRoot + "\n"});
+	file_replace(info.absoluteFilePath(), patterns);
+
+	enable();
+	return true;
+}
+
+bool VHost::enable()
+{
+	char cmd[50];
+	QFileInfo info(conf);
+   sprintf(cmd, "a2ensite %s 2>&1", info.fileName().toStdString().c_str());
+
+   FILE* stream = popen(cmd, "r");
+	if (stream) {
+		pclose(stream);
+	}
 	return true;
 }
 
@@ -91,10 +107,7 @@ bool VHost::disable()
 bool VHost::destroy()
 {
 	disable();
-	QString folder = A2Config::getAvailableSitesFolder();
-	QFileInfo info(conf);
-	QString filepath = folder.append("/").append(info.fileName());
-	QFile(filepath).remove();
+	QFile(conf).remove();
 
 	popen("apachectl -k graceful", "r");
 

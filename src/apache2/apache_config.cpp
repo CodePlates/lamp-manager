@@ -64,8 +64,9 @@ QString A2Config::getAvailableSitesFolder()
 	if (path.at(path.length() - 1) != '/') 
 		path.append('/');
 
-	if (QDir(path.append("sites-available")).exists())
+	if (QDir(path.append("sites-available")).exists()) {
 		return path;
+	}
 	else 
 		return QString::null;
 }
