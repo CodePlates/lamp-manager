@@ -25,8 +25,6 @@ int main(int argc, char *argv[])
 	window.show();
 
 	return app.exec();
-	// A2Parser::parse("test.conf");
-
 
 		
 }

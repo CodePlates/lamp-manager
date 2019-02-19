@@ -7,6 +7,7 @@ inc = include_directories('include')
 src_files = [ 
 	'main.cpp', 
 	'src/utils.cpp', 
+	'src/server.cpp', 
 	'src/lampman.cpp', 
 	'src/page_cpanel.cpp', 
 	'src/page_php.cpp', 
