@@ -24,6 +24,7 @@ PageVhosts::PageVhosts(QWidget *parent)
 	table->setSelectionBehavior(QAbstractItemView::SelectRows);
 	table->setSelectionMode(QAbstractItemView::SingleSelection);
 	table->resizeColumnsToContents();
+	table->setShowGrid(true);
 	table->show();
 
 	QVBoxLayout* tactionsVbox = new QVBoxLayout;
