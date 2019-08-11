@@ -14,7 +14,7 @@ public:
 	//VHost(QString& conf, QString& name, QString& docRoot);
 	~VHost();
 	bool save();
-	bool update();
+	bool update(QString oldname);
 	bool enable();
 	bool disable();
 	bool destroy();

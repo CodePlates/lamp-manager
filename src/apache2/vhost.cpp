@@ -1,7 +1,10 @@
 #include "include/vhost.hpp"
 #include "include/apache_config.hpp"
 #include "utils.hpp"
+#include "server.hpp"
 #include <QFileInfo>
+#include <QFile>
+#include <QDebug>
 
 VHost::VHost()
 {
@@ -68,14 +71,26 @@ bool VHost::save()
 	return true;
 }
 
-bool VHost::update()
+bool VHost::update(QString oldname)
 {
 	disable();
 	QFileInfo info(conf);
-	PatternsList patterns;
-	patterns.append({"^(\\s*ServerName\\s+).*\n", "\\1" + name + "\n"});
-	patterns.append({"^(\\s*DocumentRoot\\s+).*\n", "\\1" + docRoot + "\n"});
-	file_replace(info.absoluteFilePath(), patterns);
+	PatternsList confPatterns;
+	confPatterns.append({"^(\\s*ServerName\\s+).*\n", "\\1" + name + "\n"});
+	confPatterns.append({"^(\\s*ServerAlias\\s+).*\n", "\\1 www." + name + "\n"});
+	confPatterns.append({"^(\\s*DocumentRoot\\s+).*\n", "\\1" + docRoot + "\n"});
+	file_replace(info.absoluteFilePath(), confPatterns);
+	
+	QString filename = QString(name).append(".conf");
+	QString folder = A2Config::getAvailableSitesFolder();
+	QString filepath = QString(folder).append("/").append(filename);
+	QFile file(conf);
+	file.rename(filepath);
+	conf = filepath; 
+
+	PatternsList hostsPatterns;
+	hostsPatterns.append({"^\\s*127.0.0.1\\s+" + oldname + "\\s*\n", "127.0.0.1\t" + name + "\n"});
+	file_replace("/etc/hosts", hostsPatterns);
 
 	enable();
 	return true;
@@ -91,6 +106,8 @@ bool VHost::enable()
 	if (stream) {
 		pclose(stream);
 	}
+
+	apache_restart();
 	return true;
 }
 

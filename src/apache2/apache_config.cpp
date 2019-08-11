@@ -21,7 +21,6 @@ void A2Config::processConf()
 	if (apacheConf.isEmpty())
 		findConf();
 	configs.append(apacheConf);
-	qDebug() << "Found conf: " << apacheConf;
 	configTree = A2Parser::parse(apacheConf);
 }
 
