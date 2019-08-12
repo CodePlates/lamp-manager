@@ -56,6 +56,11 @@ void A2Config::findConf()
 
 QString A2Config::getAvailableSitesFolder()
 {
+	return getA2Path("sites-available");
+}
+
+QString A2Config::getA2Path(QString folder)
+{
 	if (apacheRoot.isEmpty()) 
 		findConf();
 
@@ -63,7 +68,10 @@ QString A2Config::getAvailableSitesFolder()
 	if (path.at(path.length() - 1) != '/') 
 		path.append('/');
 
-	if (QDir(path.append("sites-available")).exists()) {
+	if (folder == NULL)
+		return path;
+
+	if (QDir(path.append(folder)).exists()) {
 		return path;
 	}
 	else 

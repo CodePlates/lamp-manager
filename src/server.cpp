@@ -1,4 +1,5 @@
 #include "server.hpp"
+#include "utils.hpp"
 #include <QString>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
@@ -6,21 +7,7 @@
 
 QRegularExpression re("^\\s*Active:\\s+(\\w+)", QRegularExpression::MultilineOption);
 
-QString run_command(const char* command)
-{
-	QString data;
-	char buffer[256];
-	FILE* stream = popen(command, "r");
-	if (stream) {
-		while (!feof(stream)) {
-			if (fgets(buffer, 256, stream) != NULL) 
-				data.append(buffer);
-		}
-		pclose(stream);		
-	}
 
-	return data;
-}
 ServerStatus check_status(QString& data)
 {
 	QRegularExpressionMatch match = re.match(data);

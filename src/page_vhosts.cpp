@@ -3,9 +3,7 @@
 #include <QHeaderView>
 #include <QDir>
 #include "include/page_vhosts.hpp"
-#include <QTextStream>
 #include "include/vhost_dialog.hpp"
-#include <cstdio>
 #include <QItemSelectionModel>
 #include <QItemSelection>
 

@@ -6,7 +6,6 @@ enum class ServerStatus {
 	RUNNING, STOPPED, OTHER
 };
 
-QString run_command(const char* command);
 ServerStatus check_status(QString& data);
 
 ServerStatus mysql_status();

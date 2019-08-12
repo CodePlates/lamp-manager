@@ -1,8 +1,12 @@
 #pragma once
 
 #include <QWidget>
+#include <QLabel> 
 
 class PagePhp: public QWidget {
+private:
+	QLabel* a2VersionLabel = nullptr;
+	QLabel* cliVersionLabel = nullptr;
 public:
 	PagePhp(QWidget *parent = 0);
 	~PagePhp();	

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -10,3 +12,4 @@ typedef QList<QPair<QString,QString>> PatternsList;
 
 bool file_replace(QString filepath, PatternsList patterns);
 
+QString run_command(const char* command);

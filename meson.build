@@ -20,6 +20,7 @@ src_files = [
 	'src/apache2/parser/conf_tree.cpp',
 	'src/apache2/parser/scanner.cpp', 
 	'src/apache2/parser/parser.cpp', 
+	'src/php/php_config.cpp',
 ]
 
 executable('lampman', src_files,

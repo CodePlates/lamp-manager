@@ -19,6 +19,7 @@ private:
 public:
 	A2Config();
 	~A2Config();
+	static QString getA2Path(QString folder = NULL);
 	static QString getAvailableSitesFolder();
 	QList<VHost*> getVhosts();
 

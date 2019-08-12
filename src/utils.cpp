@@ -35,3 +35,19 @@ bool file_replace(QString filepath, PatternsList patterns){
    filetmp.rename(fileinfo.absoluteFilePath());
    return true;
 }
+
+QString run_command(const char* command)
+{
+	QString data;
+	char buffer[256];
+	FILE* stream = popen(command, "r");
+	if (stream) {
+		while (!feof(stream)) {
+			if (fgets(buffer, 256, stream) != NULL) 
+				data.append(buffer);
+		}
+		pclose(stream);		
+	}
+
+	return data;
+}
