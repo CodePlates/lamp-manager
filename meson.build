@@ -25,4 +25,5 @@ src_files = [
 
 executable('lampman', src_files,
   include_directories: inc,
-  dependencies : qt5_dep)
+  dependencies : qt5_dep,
+  install: true)
