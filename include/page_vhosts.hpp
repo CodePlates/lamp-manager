@@ -7,8 +7,8 @@
 #include <QDebug>
 #include <QPushButton>
 #include <QModelIndex>
-#include "include/vhost.hpp"
-#include "include/apache_config.hpp"
+#include "vhost.hpp"
+#include "apache_config.hpp"
 
 class PageVhosts: public QWidget {
 private:

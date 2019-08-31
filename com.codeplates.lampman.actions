@@ -1,0 +1,24 @@
+[com.codeplates.lampman.run.command]
+Name=Run Command action
+Description=Run various systemctl & system commands
+Policy=auth_admin
+Persistence=session
+
+[com.codeplates.lampman.file.replace]
+Name=File Replace action
+Description=Change contents in apache files
+Policy=auth_admin
+Persistence=session
+
+[com.codeplates.lampman.file.rename]
+Name=File Rename action
+Description=Change vhost config file names
+Policy=auth_admin
+Persistence=session
+
+[com.codeplates.lampman.file.write]
+Name=File Write action
+Description=Write vhost config files
+Policy=auth_admin
+Persistence=session
+

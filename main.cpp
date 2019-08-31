@@ -1,8 +1,7 @@
 #include <QApplication>
 #include <memory>
-#include "include/lampman.hpp"
+#include "lampman.hpp"
 #include <unistd.h>
-#include "utils.hpp"
 #include <QDebug>
 
 #include "apache_scanner.hpp"

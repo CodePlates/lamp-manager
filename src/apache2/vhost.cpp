@@ -1,6 +1,6 @@
-#include "include/vhost.hpp"
-#include "include/apache_config.hpp"
-#include "utils.hpp"
+#include "vhost.hpp"
+#include "apache_config.hpp"
+#include "utilities.hpp"
 #include "server.hpp"
 #include <QFileInfo>
 #include <QFile>
@@ -11,11 +11,6 @@ VHost::VHost()
 
 }
 
-// VHost::VHost(QString& conf, QString& name, QString& docRoot) :
-// 	name(name), docRoot(docRoot), conf(conf)
-// {
-
-// }
 
 VHost::~VHost()
 {
@@ -43,31 +38,17 @@ bool VHost::save()
 	QString folder = A2Config::getAvailableSitesFolder();
 	QString filepath = QString(folder).append("/").append(filename);
 
-
-	QFile file(filepath);
-	if (file.open(QIODevice::WriteOnly)) {
-    	QTextStream outstream(&file);
-    	outstream << config;
-    	file.close();
+	if (file_write(filepath, config)) {
     	conf = filepath;
    }else 
    	return false;
-
    
    enable();
 	
-	QFile hostsfile("/etc/hosts");
-	if (hostsfile.open(QIODevice::ReadWrite | QIODevice::Append)) {
-    	QTextStream outstream(&hostsfile);
-    	outstream.seek(outstream.pos() - 1);
-    	if (QString::compare(outstream.read(1), "\n") != 0){
-    		outstream << "\n";
-    	}
-    	outstream << "127.0.0.1	" << name << "\n";
-    	hostsfile.close();
-   }
+	QString host = "127.0.0.1\t" + name;
+	file_append("/etc/hosts", host);
 
-   popen("apachectl -k graceful", "r");
+   run_command("apachectl -k graceful");
 	return true;
 }
 
@@ -75,21 +56,21 @@ bool VHost::update(QString oldname)
 {
 	disable();
 	QFileInfo info(conf);
-	PatternsList confPatterns;
-	confPatterns.append({"^(\\s*ServerName\\s+).*\n", "\\1" + name + "\n"});
-	confPatterns.append({"^(\\s*ServerAlias\\s+).*\n", "\\1 www." + name + "\n"});
-	confPatterns.append({"^(\\s*DocumentRoot\\s+).*\n", "\\1" + docRoot + "\n"});
+	QMap<QString, QVariant> confPatterns;
+	confPatterns.insert("^(\\s*ServerName\\s+).*\n", "\\1" + name + "\n");
+	confPatterns.insert("^(\\s*ServerAlias\\s+).*\n", "\\1 www." + name + "\n");
+	confPatterns.insert("^(\\s*DocumentRoot\\s+).*\n", "\\1" + docRoot + "\n");
 	file_replace(info.absoluteFilePath(), confPatterns);
 	
 	QString filename = QString(name).append(".conf");
 	QString folder = A2Config::getAvailableSitesFolder();
 	QString filepath = QString(folder).append("/").append(filename);
-	QFile file(conf);
-	file.rename(filepath);
-	conf = filepath; 
+	
+	if (file_rename(conf, filepath))
+		conf = filepath; 
 
-	PatternsList hostsPatterns;
-	hostsPatterns.append({"^\\s*127.0.0.1\\s+" + oldname + "\\s*\n", "127.0.0.1\t" + name + "\n"});
+	QMap<QString, QVariant> hostsPatterns;
+	hostsPatterns.insert("^\\s*127.0.0.1\\s+" + oldname + "\\s*\n", "127.0.0.1\t" + name + "\n");
 	file_replace("/etc/hosts", hostsPatterns);
 
 	enable();
@@ -98,14 +79,11 @@ bool VHost::update(QString oldname)
 
 bool VHost::enable()
 {
-	char cmd[50];
+	
 	QFileInfo info(conf);
-   sprintf(cmd, "a2ensite %s 2>&1", info.fileName().toStdString().c_str());
+   QString command = QString("a2ensite %1 2>&1").arg(info.fileName());
 
-   FILE* stream = popen(cmd, "r");
-	if (stream) {
-		pclose(stream);
-	}
+  run_command(command);
 
 	apache_restart();
 	return true;
@@ -113,23 +91,22 @@ bool VHost::enable()
 
 bool VHost::disable()
 {
-	char cmd[50];
 	QFileInfo info(conf);
-   sprintf(cmd, "a2dissite %s 2>&1", info.fileName().toStdString().c_str());
+   QString command = QString("a2dissite %1 2>&1").arg(info.fileName());
 
-   popen(cmd, "r");
+   run_command(command);
 	return true;
 }
 
 bool VHost::destroy()
 {
 	disable();
-	QFile(conf).remove();
+	// QFile(conf).remove();
 
-	popen("apachectl -k graceful", "r");
+	run_command("apachectl -k graceful");
 
-	PatternsList patterns;
-	patterns.append({"^\\s*127.0.0.1\\s+" + name + "\\s*\n", ""});
+	QMap<QString, QVariant> patterns;
+	patterns.insert("^\\s*127.0.0.1\\s+" + name + "\\s*\n", "");
 	file_replace("/etc/hosts", patterns);
 	return true; 
 }

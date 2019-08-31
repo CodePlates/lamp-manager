@@ -1,6 +1,6 @@
-#include "include/php_config.hpp"
-#include "include/utils.hpp"
-#include "include/apache_config.hpp"
+#include "php_config.hpp"
+#include "utilities.hpp"
+#include "apache_config.hpp"
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QDebug>
@@ -10,7 +10,7 @@ QString get_php_apache_version()
 	QString version = "Unknown";
 	QString command = QString("ls %1 | grep php.*.load").arg(A2Config::getA2Path("mods-enabled"));
 
-	QString result = run_command(command.toStdString().c_str());
+	QString result = run_command(command);
 	QRegularExpression re("^php(\\d+.\\d+(.\\d+)?)\\.load");
 	QRegularExpressionMatch match = re.match(result);
 	if (match.hasMatch()) {

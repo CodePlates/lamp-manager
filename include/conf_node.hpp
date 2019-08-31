@@ -1,8 +1,8 @@
 #pragma once 
 
 #include <QStringList>
-#include "include/conf_node_base.hpp"
-#include "include/conf_tree.hpp"
+#include "conf_node_base.hpp"
+#include "conf_tree.hpp"
 
 
 class KeyvalNode : public ConfNode

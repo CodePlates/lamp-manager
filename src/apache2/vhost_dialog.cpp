@@ -5,7 +5,7 @@
 #include <QFormLayout>
 #include <QFileDialog>
 #include <QDialogButtonBox>
-#include "include/vhost_dialog.hpp"
+#include "vhost_dialog.hpp"
 
 VHostDialog::VHostDialog(QWidget *parent) :
 	QDialog(parent)

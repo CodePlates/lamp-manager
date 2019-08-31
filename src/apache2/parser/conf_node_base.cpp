@@ -1,4 +1,4 @@
-#include "include/conf_node_base.hpp"
+#include "conf_node_base.hpp"
 
 ConfNode::ConfNode(QString key, QStringList values) : 
 	m_key(key), m_values(values) 

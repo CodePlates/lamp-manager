@@ -1,8 +1,9 @@
 #include <cstdio>
 #include <QDir>
-#include "include/apache_config.hpp"
-#include "include/apache_parser.hpp"
+#include "apache_config.hpp"
+#include "apache_parser.hpp"
 #include <QDebug>
+#include "utilities.hpp"
 
 QString A2Config::apacheConf = "";
 QString A2Config::apacheRoot = "";
@@ -28,18 +29,9 @@ void A2Config::findConf()
 {
 	QString data, conf;
 	int i;
-	char buffer[256];
-	const char* cmd = "apachectl -V 2>&1";
 
-	FILE* stream = popen(cmd, "r");
-	if (stream) {
-		while (!feof(stream)) {
-			if (fgets(buffer, 256, stream) != NULL) 
-				data.append(buffer);
-		}
-		pclose(stream);
-	}
-
+	data = run_command("apachectl -V 2>&1");
+	
 	i = data.indexOf("HTTPD_ROOT=");
 	for (i = i+12; data.at(i) != '"'; i++)
 		apacheRoot.append(data.at(i));

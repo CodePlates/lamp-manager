@@ -1,4 +1,4 @@
-#include "include/conf_tree.hpp"
+#include "conf_tree.hpp"
 #include <QDebug>
 
 ConfTree::ConfTree() {}

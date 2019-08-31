@@ -2,8 +2,8 @@
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QDir>
-#include "include/page_vhosts.hpp"
-#include "include/vhost_dialog.hpp"
+#include "page_vhosts.hpp"
+#include "vhost_dialog.hpp"
 #include <QItemSelectionModel>
 #include <QItemSelection>
 

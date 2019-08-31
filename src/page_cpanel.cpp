@@ -1,6 +1,6 @@
 #include <QVBoxLayout>
 #include <QGridLayout>
-#include "include/page_cpanel.hpp"
+#include "page_cpanel.hpp"
 
 
 PageCpanel::PageCpanel(QWidget *parent)

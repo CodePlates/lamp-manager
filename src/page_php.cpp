@@ -4,8 +4,8 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QComboBox>
-#include "include/page_php.hpp"
-#include "include/php_config.hpp"
+#include "page_php.hpp"
+#include "php_config.hpp"
 
 
 PagePhp::PagePhp(QWidget *parent)

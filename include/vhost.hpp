@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QDebug>
-#include "include/conf_node.hpp"
+#include "conf_node.hpp"
 
 class VHost
 {

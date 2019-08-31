@@ -2,7 +2,7 @@
 
 #include <QWidget>
 #include <QDialog>
-#include "include/vhost.hpp"
+#include "vhost.hpp"
 
 class VHostDialog : public QDialog {
 private:

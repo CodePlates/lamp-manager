@@ -1,4 +1,4 @@
-#include "include/conf_node.hpp"
+#include "conf_node.hpp"
 
 
 KeyvalNode::KeyvalNode(QString key, QStringList values) :

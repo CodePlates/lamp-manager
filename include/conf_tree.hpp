@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QHash>
-#include "include/conf_node_base.hpp"
+#include "conf_node_base.hpp"
 
 class ConfTree
 {

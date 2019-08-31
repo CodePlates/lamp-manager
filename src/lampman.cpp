@@ -2,10 +2,10 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QTabWidget>
-#include "include/lampman.hpp"
-#include "include/page_cpanel.hpp"
-#include "include/page_vhosts.hpp"
-#include "include/page_php.hpp"
+#include "lampman.hpp"
+#include "page_cpanel.hpp"
+#include "page_vhosts.hpp"
+#include "page_php.hpp"
 
 
 Lampman::Lampman(QWidget *parent)
