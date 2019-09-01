@@ -161,6 +161,8 @@ ActionReply LampmanHelper::run_command(const QVariantMap &args)
 	}else {
 		QVariantMap map;
 		map["content"] = QString(term.readAllStandardOutput());
+		if (command == "apachectl")
+			qDebug() << map["content"];
    	reply.setData(map);
 	}
 

@@ -8,7 +8,7 @@
 #include <KAuth>
 #include <QDebug>
 
-QString run_command(QString command, QStringList options = QStringList());
+QString run_command(QString command, QStringList options = QStringList(), bool asRoot = false);
 
 void file_replace(QString filepath, QMap<QString, QVariant> patterns);
 

@@ -13,7 +13,7 @@ QString get_php_apache_version()
 	QString modsDir = A2Config::getA2Path("mods-enabled");
 
 	QString result = run_command("ls", {modsDir});
-	QRegularExpression re("^php(\\d+.\\d+(.\\d+)?)\\.load");
+	QRegularExpression re("\nphp(\\d+.\\d+(.\\d+)?)\\.load");
 	QRegularExpressionMatch match = re.match(result);
 	if (match.hasMatch()) {
 		version = match.captured(1);

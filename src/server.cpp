@@ -25,49 +25,49 @@ ServerStatus check_status(QString& data)
 
 ServerStatus mysql_status()
 {	
-	QString data = run_command("systemctl", {"status", "mysql"});
+	QString data = run_command("systemctl", {"status", "mysql"}, true);
 	return check_status(data);
 }
 
 bool mysql_start()
 {
-	run_command("systemctl", {"start", "mysql"});
+	run_command("systemctl", {"start", "mysql"}, true);
 	return true;
 }
 
 bool mysql_stop()
 {
-	run_command("systemctl", {"stop", "mysql"});
+	run_command("systemctl", {"stop", "mysql"}, true);
 	return true;
 }
 
 bool mysql_restart()
 {
-	run_command("systemctl", {"restart", "mysql"});
+	run_command("systemctl", {"restart", "mysql"}, true);
 	return true;
 }
 
 
 ServerStatus apache_status()
 {
-	QString data = run_command("systemctl", {"status", "apache2"});
+	QString data = run_command("systemctl", {"status", "apache2"}, true);
 	return check_status(data);
 }
 
 bool apache_start()
 {
-	run_command("systemctl", {"start", "apache2"});
+	run_command("systemctl", {"start", "apache2"}, true);
 	return true;
 }
 
 bool apache_stop()
 {
-	run_command("systemctl", {"stop", "apache2"});
+	run_command("systemctl", {"stop", "apache2"}, true);
 	return true;
 }
 
 bool apache_restart()
 {
-	run_command("systemctl", {"restart", "apache2"});
+	run_command("systemctl", {"restart", "apache2"}, true);
 	return true;
 }

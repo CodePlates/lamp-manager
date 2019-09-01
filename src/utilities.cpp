@@ -1,7 +1,21 @@
 #include "utilities.hpp"
+#include <QProcess>
 
-QString run_command(QString command, QStringList options)
+QString run_command(QString command, QStringList options, bool asRoot)
 {
+	if (!asRoot) {
+		QProcess term;
+		term.start(command, options);
+
+		if (!term.waitForFinished()) {
+			qDebug() << command << " :: " << options;
+			qDebug() << "Exit Code: " << term.exitCode();
+			return QString();
+		}else {
+			return QString(term.readAllStandardOutput());
+		}
+	}
+
 	QVariantMap args;
 	args["command"] = command;
 	args["options"] = options;

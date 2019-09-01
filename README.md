@@ -10,7 +10,7 @@ Built with C++ and Qt
 
 ## Requirements
 
-This project requires Qt5 and the [meson build system](https://mesonbuild.com)
+This project requires Qt5 
 
 ## Installation
 
@@ -18,14 +18,17 @@ To install lampman,
 
 1. Clone or download the repository and open a terminal in the project folder
 
-2. Install with meson and ninja
+2. Compile using cmake
 ```
-meson buildir
-sudo ninja -C builddir
+mkdir build
+cd build
+cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+make
+sudo make install
 ```
 
 3. Run lampman
 ```
-sudo lampman
+lampman
 ```
 
