@@ -1,13 +1,9 @@
 #include "apache_scanner.hpp"
+#include "utilities.hpp"
 
 A2Scanner::A2Scanner(QString filepath)
 {
-	QFile file(filepath);
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		qWarning("Cannot open file");
-	}
-	QTextStream in(&file);
-	contents = in.readAll();
+	contents = file_read(filepath);
 	contents.append('\n');
 }
 

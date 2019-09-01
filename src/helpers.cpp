@@ -4,23 +4,45 @@
 #include <QTextStream>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
+#include <QProcess>
 #include <QDebug>
 #include <QObject>
 #include <KAuth>
 
+using namespace KAuth;
 
 class LampmanHelper : public QObject
 {
    Q_OBJECT
+protected:
+   ActionReply file_replace(const QVariantMap& args);
+   ActionReply file_write(const QVariantMap& args);
+   ActionReply file_rename(const QVariantMap& args);
+   ActionReply file_read(const QVariantMap& args);
+   ActionReply run_command(const QVariantMap& args);
+
 public Q_SLOTS:
-   KAuth::ActionReply file_replace(const QVariantMap& args);
-   KAuth::ActionReply file_write(const QVariantMap& args);
-   KAuth::ActionReply file_rename(const QVariantMap& args);
-   KAuth::ActionReply run_command(const QVariantMap& args);
+   ActionReply dispatch(const QVariantMap& args);
 };
 
-KAuth::ActionReply LampmanHelper::file_write(const QVariantMap &args){
-	KAuth::ActionReply reply;
+ActionReply LampmanHelper::dispatch(const QVariantMap& args)
+{
+	QString action = args["action"].toString();
+	if (action == "file_write")
+		return file_write(args);
+	else if (action == "file_rename")
+		return file_rename(args);
+	else if (action == "file_read")
+		return file_read(args);
+	else if (action == "file_replace")
+		return file_replace(args);
+	else if (action == "run_command")
+		return run_command(args);
+}
+
+ActionReply LampmanHelper::file_write(const QVariantMap &args) 
+{
+	ActionReply reply;
 	QString filepath = args["filepath"].toString();
 	QString contents = args["contents"].toString();
 	bool append = args.value("append", false).toBool();
@@ -40,29 +62,51 @@ KAuth::ActionReply LampmanHelper::file_write(const QVariantMap &args){
     	outstream << contents << "\n";
     	file.close();
    } else {
-   	reply = KAuth::ActionReply::HelperErrorReply();
+   	reply = ActionReply::HelperErrorReply();
    	reply.setErrorDescription(file.errorString());
    }
 
    return reply;
 }
 
-KAuth::ActionReply LampmanHelper::file_rename(const QVariantMap &args){
-	KAuth::ActionReply reply;
+ActionReply LampmanHelper::file_rename(const QVariantMap &args)
+{
+	ActionReply reply;
 	QString filepath = args["filepath"].toString();
 	QString name = args["name"].toString();
 
 	QFile file(filepath);
 	if (!file.rename(name)) {
-   	reply = KAuth::ActionReply::HelperErrorReply();
+   	reply = ActionReply::HelperErrorReply();
    	reply.setErrorDescription(file.errorString());
    }
 
    return reply;
 }
 
-KAuth::ActionReply LampmanHelper::file_replace(const QVariantMap &args){
-	KAuth::ActionReply reply;
+ActionReply LampmanHelper::file_read(const QVariantMap &args) 
+{
+	ActionReply reply;
+	QString filepath = args["filepath"].toString();
+
+	QFile file(filepath);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		reply = ActionReply::HelperErrorReply();
+		reply.setErrorDescription(file.errorString());
+   }else {
+		QTextStream in(&file);
+		QString contents = in.readAll();
+		QVariantMap map;
+		map["content"] = QVariant(contents);
+      reply.setData(map);
+   }
+
+   return reply;
+}
+
+ActionReply LampmanHelper::file_replace(const QVariantMap &args) 
+{
+	ActionReply reply;
 	QString filepath = args["filepath"].toString();
 	QMap<QString, QVariant> patterns = args["patterns"].toMap();
 
@@ -72,10 +116,10 @@ KAuth::ActionReply LampmanHelper::file_replace(const QVariantMap &args){
 	QFile filetmp(tmpFile);
 
 	if(!file.open(QIODevice::ReadOnly)){
-	   reply = KAuth::ActionReply::HelperErrorReply();
+	   reply = ActionReply::HelperErrorReply();
 	   reply.setErrorDescription(file.errorString());
 	}else if (!filetmp.open(QIODevice::WriteOnly)){
-	   reply = KAuth::ActionReply::HelperErrorReply();
+	   reply = ActionReply::HelperErrorReply();
 	   reply.setErrorDescription(filetmp.errorString());
 	}else{
 		QTextStream in(&file);
@@ -100,26 +144,24 @@ KAuth::ActionReply LampmanHelper::file_replace(const QVariantMap &args){
 	return reply;
 }
 
-KAuth::ActionReply LampmanHelper::run_command(const QVariantMap &args)
+ActionReply LampmanHelper::run_command(const QVariantMap &args)
 {
-	KAuth::ActionReply reply;
-	const char* command = args["command"].toString().toStdString().c_str();
+	ActionReply reply;
+	QString command = args["command"].toString();
+	QStringList opts = args["options"].toStringList();
 
-	QString data;
-	char buffer[256];
-	FILE* stream = popen(command, "r");
-	if (stream) {
-		while (!feof(stream)) {
-			if (fgets(buffer, 256, stream) != NULL) 
-				data.append(buffer);
-		}
-		pclose(stream);
+	QProcess term;
+	term.start(command, opts);
+
+	if (!term.waitForFinished(-1)) {
+		reply = ActionReply::HelperErrorReply();
+		qDebug() << command << " :: " << opts;
+		qDebug() << "Exit Code: " << term.exitCode();
+		reply.setErrorDescription("Unable to run sh!");
+	}else {
 		QVariantMap map;
-		map["content"] = QVariant(data);
-      reply.setData(map);
-	} else {
-		reply = KAuth::ActionReply::HelperErrorReply();
-		reply.setErrorDescription("Unable to run command: ");
+		map["content"] = QString(term.readAllStandardOutput());
+   	reply.setData(map);
 	}
 
 	return reply;

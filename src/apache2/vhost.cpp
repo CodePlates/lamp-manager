@@ -48,7 +48,7 @@ bool VHost::save()
 	QString host = "127.0.0.1\t" + name;
 	file_append("/etc/hosts", host);
 
-   run_command("apachectl -k graceful");
+   run_command("apachectl", {"-k", "graceful"});
 	return true;
 }
 
@@ -81,9 +81,7 @@ bool VHost::enable()
 {
 	
 	QFileInfo info(conf);
-   QString command = QString("a2ensite %1 2>&1").arg(info.fileName());
-
-  run_command(command);
+	run_command("a2ensite", {info.fileName()});
 
 	apache_restart();
 	return true;
@@ -92,9 +90,7 @@ bool VHost::enable()
 bool VHost::disable()
 {
 	QFileInfo info(conf);
-   QString command = QString("a2dissite %1 2>&1").arg(info.fileName());
-
-   run_command(command);
+   run_command("a2dissite", {info.fileName()});
 	return true;
 }
 
@@ -103,7 +99,7 @@ bool VHost::destroy()
 	disable();
 	// QFile(conf).remove();
 
-	run_command("apachectl -k graceful");
+	run_command("apachectl", {"-k", "graceful"});
 
 	QMap<QString, QVariant> patterns;
 	patterns.insert("^\\s*127.0.0.1\\s+" + name + "\\s*\n", "");

@@ -21,6 +21,8 @@ void A2Config::processConf()
 {
 	if (apacheConf.isEmpty())
 		findConf();
+
+	// qDebug() << "The conf file is: " << apacheConf;
 	configs.append(apacheConf);
 	configTree = A2Parser::parse(apacheConf);
 }
@@ -30,8 +32,9 @@ void A2Config::findConf()
 	QString data, conf;
 	int i;
 
-	data = run_command("apachectl -V 2>&1");
-	
+	data = run_command("apachectl", {"-V"});
+	qDebug() << "Data received is" << data;
+
 	i = data.indexOf("HTTPD_ROOT=");
 	for (i = i+12; data.at(i) != '"'; i++)
 		apacheRoot.append(data.at(i));

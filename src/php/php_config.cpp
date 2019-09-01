@@ -3,14 +3,16 @@
 #include "apache_config.hpp"
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
+#include <QProcess>
 #include <QDebug>
 
 QString get_php_apache_version()
 {
 	QString version = "Unknown";
-	QString command = QString("ls %1 | grep php.*.load").arg(A2Config::getA2Path("mods-enabled"));
 
-	QString result = run_command(command);
+	QString modsDir = A2Config::getA2Path("mods-enabled");
+
+	QString result = run_command("ls", {modsDir});
 	QRegularExpression re("^php(\\d+.\\d+(.\\d+)?)\\.load");
 	QRegularExpressionMatch match = re.match(result);
 	if (match.hasMatch()) {
@@ -22,7 +24,7 @@ QString get_php_apache_version()
 QString get_php_cli_version()
 {
 	QString version = "Unknown";
-	QString result = run_command("php --version");
+	QString result = run_command("php", {"--version"});
 	QRegularExpression re("^PHP (\\d+.\\d+(.\\d+)?)-");
 	QRegularExpressionMatch match = re.match(result);
 	if (match.hasMatch()) {
