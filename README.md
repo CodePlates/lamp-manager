@@ -32,3 +32,9 @@ sudo make install
 lampman
 ```
 
+## Contact
+
+If you need to contact the developer to complain, request for features or discuss  
+Email: [joshuakisb@gmail.com](mailto:joshuakisb@gmail.com)  
+Telegram: [@JoshKisb](https://t.me/JoshKisb)
+
