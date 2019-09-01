@@ -153,7 +153,7 @@ ActionReply LampmanHelper::run_command(const QVariantMap &args)
 	QProcess term;
 	term.start(command, opts);
 
-	if (!term.waitForFinished(-1)) {
+	if (!term.waitForFinished()) {
 		reply = ActionReply::HelperErrorReply();
 		qDebug() << command << " :: " << opts;
 		qDebug() << "Exit Code: " << term.exitCode();

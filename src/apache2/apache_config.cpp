@@ -32,21 +32,22 @@ void A2Config::findConf()
 	QString data, conf;
 	int i;
 
-	data = run_command("apachectl", {"-V"});
-	qDebug() << "Data received is" << data;
+	// data = run_command("apachectl", {"-V"});
+	// qDebug() << "Data received is" << data;
 
-	i = data.indexOf("HTTPD_ROOT=");
-	for (i = i+12; data.at(i) != '"'; i++)
-		apacheRoot.append(data.at(i));
+	// i = data.indexOf("HTTPD_ROOT=");
+	// for (i = i+12; data.at(i) != '"'; i++)
+	// 	apacheRoot.append(data.at(i));
 
-	i = data.indexOf("SERVER_CONFIG_FILE=");
-	for (i = i+20; data.at(i) != '"'; i++)
-		conf.append(data.at(i));
+	// i = data.indexOf("SERVER_CONFIG_FILE=");
+	// for (i = i+20; data.at(i) != '"'; i++)
+	// 	conf.append(data.at(i));
 
-	apacheConf = apacheRoot;
-	if (apacheConf.at(apacheConf.length() - 1) != '/') apacheConf.append('/');
-	apacheConf.append(conf);
-
+	// apacheConf = apacheRoot;
+	// if (apacheConf.at(apacheConf.length() - 1) != '/') apacheConf.append('/');
+	// apacheConf.append(conf);
+	apacheRoot = "/etc/apache2";
+	apacheConf = "/etc/apache2/apache2.conf";
 }
 
 QString A2Config::getAvailableSitesFolder()
