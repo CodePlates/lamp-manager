@@ -14,7 +14,11 @@ This project requires Qt5
 
 ## Installation
 
-To install lampman,
+Download and install the deb from [releases section](https://github.com/CodePlates/lamp-manager/releases)
+
+Or 
+
+To compile and install lampman from source,  
 
 1. Clone or download the repository and open a terminal in the project folder
 
