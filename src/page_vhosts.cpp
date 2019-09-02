@@ -78,8 +78,8 @@ void PageVhosts::loadVHostsModel()
    
    for (int row = 0; row < vhosts.length(); row++) {
    	VHost* vhost = vhosts.at(row);
-      model->setItem(row, 0, new QStandardItem(vhost->name));
-      model->setItem(row, 1, new QStandardItem(vhost->docRoot));
+      model->setItem(row, 0, new QStandardItem(vhost->getName()));
+      model->setItem(row, 1, new QStandardItem(vhost->getDocRoot()));
    }
 }
 
@@ -101,8 +101,8 @@ void PageVhosts::onAddVHostClicked()
 		if (vh->save()) {
 			vhosts.append(vh);
 			QList<QStandardItem*> cols;
-			cols << new QStandardItem(vh->name);
-			cols << new QStandardItem(vh->docRoot);
+			cols << new QStandardItem(vh->getName());
+			cols << new QStandardItem(vh->getDocRoot());
 			model->appendRow(cols);
 		}
 	}
@@ -112,7 +112,6 @@ void PageVhosts::onEditVHostClicked()
 {
 	VHostDialog dialog(this);
 	VHost* vh = vhosts.at(selectedRow);
-	QString oldname = vh->name;
 	dialog.setVHost(vh);
 	dialog.setWindowTitle("Edit VirtualHost");
 	dialog.exec();
@@ -120,9 +119,9 @@ void PageVhosts::onEditVHostClicked()
 	if (dialog.result() == QDialog::Accepted) {
 		VHost* vh = dialog.getVHost();
 
-		if (vh->update(oldname)) {
-			model->item(selectedRow, 0)->setData(vh->name, Qt::DisplayRole);
-			model->item(selectedRow, 1)->setData(vh->docRoot, Qt::DisplayRole);
+		if (vh->update()) {
+			model->item(selectedRow, 0)->setData(vh->getName(), Qt::DisplayRole);
+			model->item(selectedRow, 1)->setData(vh->getDocRoot(), Qt::DisplayRole);
 		}
 	}
 }

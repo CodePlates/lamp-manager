@@ -6,18 +6,29 @@ QString run_command(QString command, QStringList options, bool asRoot)
 	if (!asRoot) {
 		QProcess term;
 		term.start(command, options);
-
 		if (!term.waitForFinished()) {
-			qDebug() << command << " :: " << options;
-			qDebug() << "Exit Code: " << term.exitCode();
+			qDebug() << "Error: " << term.errorString();
 			return QString();
 		}else {
 			return QString(term.readAllStandardOutput());
 		}
-	}
+	} 
 
+	static QMap<QString, QString> commandsMap;
+
+	if (!commandsMap.contains(command)) {
+		QProcess term;
+		term.start("which", {command});
+		if (!term.waitForFinished()) {
+			qDebug() << "Error: " << term.errorString();
+			return QString();
+		}else {
+			commandsMap[command] = QString(term.readAllStandardOutput()).trimmed();
+		}
+	}
+		
 	QVariantMap args;
-	args["command"] = command;
+	args["command"] = commandsMap.value(command);;
 	args["options"] = options;
 	args["action"] = "run_command";
 

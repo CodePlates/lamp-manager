@@ -11,7 +11,7 @@ set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 include(KDEInstallDirs)
 
 set(HELPER "src/helpers.cpp")
-				# "src/utilities.cpp"  
+
 set(SOURCES 
 		"main.cpp"  
 		"src/utilities.cpp"  
@@ -28,7 +28,8 @@ set(SOURCES
 		"src/apache2/parser/conf_tree.cpp" 
 		"src/apache2/parser/scanner.cpp"  
 		"src/apache2/parser/parser.cpp"  
-		"src/php/php_config.cpp" )
+		"src/php/php_config.cpp" 
+	)
 
 
 # Find necessary Qt and Kf5Ath libraries.

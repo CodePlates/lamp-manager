@@ -80,10 +80,11 @@ QList<VHost*> A2Config::getVhosts()
 		TagNode* tag = (TagNode*) node;
 
 		QFileInfo info(tag->parent->getFilepath());
-		VHost* vhost = new VHost();
-		vhost->name = tag->getValue("ServerName", "localhost");
-		vhost->docRoot = tag->getValue("DocumentRoot");
-		vhost->conf = folder + info.fileName();
+		QString name = tag->getValue("ServerName", "localhost");
+		QString docRoot = tag->getValue("DocumentRoot");
+		QString conf = folder + info.fileName();
+
+		VHost* vhost = new VHost(name, docRoot, conf);
 		vhosts.append(vhost);
 	}
 

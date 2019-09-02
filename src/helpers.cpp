@@ -155,14 +155,10 @@ ActionReply LampmanHelper::run_command(const QVariantMap &args)
 
 	if (!term.waitForFinished()) {
 		reply = ActionReply::HelperErrorReply();
-		qDebug() << command << " :: " << opts;
-		qDebug() << "Exit Code: " << term.exitCode();
-		reply.setErrorDescription("Unable to run sh!");
+		reply.setErrorDescription(term.errorString());
 	}else {
 		QVariantMap map;
 		map["content"] = QString(term.readAllStandardOutput());
-		if (command == "apachectl")
-			qDebug() << map["content"];
    	reply.setData(map);
 	}
 

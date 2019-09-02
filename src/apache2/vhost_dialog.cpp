@@ -51,16 +51,15 @@ VHost* VHostDialog::getVHost()
 	if (vhost == nullptr){
 		vhost = new VHost();
 	}
-	vhost->name = nameEdit->text();
-	vhost->docRoot = docRootEdit->text();
+	vhost->setDetails(nameEdit->text(), docRootEdit->text());
 	return vhost;
 }
 
 void VHostDialog::setVHost(VHost* vh)
 {
 	vhost = vh;
-	nameEdit->setText(vh->name);
-	docRootEdit->setText(vh->docRoot);
+	nameEdit->setText(vh->getName());
+	docRootEdit->setText(vh->getDocRoot());
 }
 
 VHostDialog::~VHostDialog()
