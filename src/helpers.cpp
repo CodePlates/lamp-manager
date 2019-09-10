@@ -30,6 +30,8 @@ ActionReply LampmanHelper::dispatch(const QVariantMap& args)
 	QString action = args["action"].toString();
 	if (action == "file_write")
 		return file_write(args);
+	else if (action == "file_append")
+		return file_write(args);
 	else if (action == "file_rename")
 		return file_rename(args);
 	else if (action == "file_read")

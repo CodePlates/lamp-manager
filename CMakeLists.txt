@@ -4,6 +4,8 @@ project(lampman)
 include_directories(include)
 set(CMAKE_INCLUDE_CURRENT_DIR YES)
 
+set(CMAKE_CXX_STANDARD 11)
+
 # Needed for installation of the required helpers at KDE directories
 find_package(ECM REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
